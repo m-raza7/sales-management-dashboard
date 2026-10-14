@@ -1,0 +1,46 @@
+
+src/
+├── app/
+│   ├── layout.tsx
+│   ├── globals.css
+│   ├── page.tsx
+│   └── (admin)/
+│       ├── layout.tsx
+│       ├── dashboard/page.tsx
+│       ├── customers/page.tsx
+│       ├── products/page.tsx
+│       └── orders/page.tsx
+│
+├── components/
+│   ├── layout/
+│   │   ├── Sidebar.tsx
+│   │   └── AdminShell.tsx
+│   └── common/
+│       └── PageHeader.tsx
+│
+├── features/
+│   ├── customers/
+│   │   ├── types.ts
+│   │   ├── customer.service.ts
+│   │   └── CustomerForm.tsx
+│   ├── products/
+│   │   ├── types.ts
+│   │   ├── product.service.ts
+│   │   └── ProductForm.tsx
+│   └── orders/
+│       ├── types.ts
+│       ├── order.service.ts
+│       └── OrderForm.tsx
+│
+├── lib/
+│   ├── storage/
+│   │   ├── local-storage.ts
+│   │   └── storage-keys.ts
+│   ├── formatters.ts
+│   └── utils.ts
+│
+└── types/
+    └── index.ts
+
+public/
+└── images/

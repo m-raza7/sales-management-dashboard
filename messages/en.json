@@ -1,0 +1,3 @@
+{
+  "app": { "name": "Sales Management", "dashboard": "Dashboard", "customers": "Customers", "products": "Products", "orders": "Orders", "settings": "Settings" }
+}
