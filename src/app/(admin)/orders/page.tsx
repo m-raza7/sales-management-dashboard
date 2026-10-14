@@ -21,6 +21,9 @@ import {
   updateOrderStatus,
 } from "@/features/orders/order.service";
 
+import { useLanguage } from "@/components/providers/LanguageProvider";
+import { translations } from "@/lib/i18n/translations";
+
 const money = (value: number) =>
   new Intl.NumberFormat("en-IN", {
     style: "currency",
@@ -40,6 +43,9 @@ const statusStyles: Record<OrderStatus, string> = {
 };
 
 export default function OrdersPage() {
+  const { language, mounted } = useLanguage();
+  const t = translations[language];
+
   const [orders, setOrders] = useState<Order[]>([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -61,7 +67,7 @@ export default function OrdersPage() {
 
   function handleDelete(order: Order) {
     const confirmed = window.confirm(
-      `Are you sure you want to delete order ${order.orderNumber}?`,
+      `${t.confirmDelete}: ${order.orderNumber}?`,
     );
 
     if (!confirmed) return;
@@ -94,29 +100,54 @@ export default function OrdersPage() {
     .filter((order) => order.status !== "cancelled")
     .reduce((sum, order) => sum + order.total, 0);
 
+  const statusLabels: Record<OrderStatus, string> = {
+    pending: t.pending,
+    confirmed: t.confirmed,
+    dispatched: t.dispatched,
+    delivered: t.delivered,
+    cancelled: t.cancelled,
+  };
+
   const stats = [
     {
-      label: "Total orders",
+      label: t.totalOrdersLabel,
       value: ready ? String(orders.length) : "—",
-      detail: "All recorded orders",
+      detail: t.allRecordedOrders,
       icon: ShoppingCart,
       iconClass: "bg-primary/10 text-primary",
     },
     {
-      label: "Pending orders",
+      label: t.pendingOrders,
       value: ready ? String(pendingCount) : "—",
-      detail: "Awaiting confirmation",
+      detail: t.awaitingConfirmation,
       icon: Clock3,
       iconClass: "bg-amber-500/10 text-amber-700 dark:text-amber-300",
     },
     {
-      label: "Total order value",
+      label: t.totalOrderValue,
       value: ready ? money(totalOrderValue) : "—",
-      detail: "Excludes cancelled orders",
+      detail: t.excludesCancelledOrders,
       icon: IndianRupee,
       iconClass: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
     },
   ];
+
+  if (!mounted) {
+    return (
+      <div className="min-w-0 space-y-6 text-foreground">
+        <div className="h-24 animate-pulse rounded-2xl bg-muted" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {[1, 2, 3].map((item) => (
+            <div
+              key={item}
+              className="h-28 animate-pulse rounded-2xl bg-muted"
+            />
+          ))}
+        </div>
+        <div className="h-72 animate-pulse rounded-2xl bg-muted" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-w-0 space-y-6 text-foreground sm:space-y-8">
@@ -125,15 +156,15 @@ export default function OrdersPage() {
         <div className="min-w-0">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
             <ShoppingCart size={15} className="text-gold" />
-            Sales management
+            {t.salesManagement}
           </div>
 
           <h1 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
-            Orders
+            {t.orders}
           </h1>
 
           <p className="mt-2 text-sm text-muted-foreground sm:text-base">
-            Manage shop orders, track progress and review order totals.
+            {t.ordersDescription}
           </p>
         </div>
 
@@ -142,7 +173,7 @@ export default function OrdersPage() {
           className="inline-flex min-h-11 w-fit shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <Plus size={18} />
-          New order
+          {t.newOrder}
         </Link>
       </section>
 
@@ -179,9 +210,9 @@ export default function OrdersPage() {
         {/* Search and filters */}
         <div className="flex flex-col justify-between gap-4 border-b border-border p-4 sm:p-5 lg:flex-row lg:items-center">
           <div>
-            <h2 className="text-base font-semibold">Order history</h2>
+            <h2 className="text-base font-semibold">{t.orderHistory}</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Search orders and update their status.
+              {t.searchAndUpdateOrders}
             </p>
           </div>
 
@@ -189,6 +220,7 @@ export default function OrdersPage() {
             <div className="relative min-w-0 flex-1">
               <Search
                 size={18}
+                aria-hidden="true"
                 className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
               />
 
@@ -196,15 +228,16 @@ export default function OrdersPage() {
                 type="search"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search order, shop or product..."
-                aria-label="Search orders"
+                placeholder={t.searchOrderPlaceholder}
+                aria-label={t.searchOrders}
                 className="h-11 w-full rounded-xl border border-border bg-background pl-10 pr-10 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20"
               />
 
               {search && (
                 <button
                   type="button"
-                  aria-label="Clear order search"
+                  aria-label={t.clearSearch}
+                  title={t.clearSearch}
                   onClick={() => setSearch("")}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition hover:text-foreground"
                 >
@@ -216,22 +249,22 @@ export default function OrdersPage() {
             <select
               value={statusFilter}
               onChange={(event) => setStatusFilter(event.target.value)}
-              aria-label="Filter orders by status"
+              aria-label={t.filterOrdersByStatus}
               className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/20 sm:w-44 dark:[color-scheme:dark]"
             >
-              <option value="all">All statuses</option>
-              <option value="pending">Pending</option>
-              <option value="confirmed">Confirmed</option>
-              <option value="dispatched">Dispatched</option>
-              <option value="delivered">Delivered</option>
-              <option value="cancelled">Cancelled</option>
+              <option value="all">{t.allStatuses}</option>
+              <option value="pending">{t.pending}</option>
+              <option value="confirmed">{t.confirmed}</option>
+              <option value="dispatched">{t.dispatched}</option>
+              <option value="delivered">{t.delivered}</option>
+              <option value="cancelled">{t.cancelled}</option>
             </select>
           </div>
         </div>
 
         {!ready ? (
           <div className="p-10 text-center text-sm text-muted-foreground">
-            Loading orders...
+            {t.loadingOrders}
           </div>
         ) : filteredOrders.length === 0 ? (
           <div className="px-5 py-14 text-center sm:py-16">
@@ -245,14 +278,14 @@ export default function OrdersPage() {
 
             <h3 className="mt-4 text-base font-semibold">
               {search || statusFilter !== "all"
-                ? "No matching orders"
-                : "No orders yet"}
+                ? t.noMatchingOrders
+                : t.noOrdersYet}
             </h3>
 
             <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-muted-foreground">
               {search || statusFilter !== "all"
-                ? "Try changing your search or status filter."
-                : "Create your first order to start tracking sales."}
+                ? t.changeOrderFilters
+                : t.createFirstOrderDescription}
             </p>
 
             {search || statusFilter !== "all" ? (
@@ -264,7 +297,7 @@ export default function OrdersPage() {
                 }}
                 className="mt-5 rounded-xl border border-border px-4 py-2.5 text-sm font-medium transition hover:bg-muted"
               >
-                Clear filters
+                {t.clearFilters}
               </button>
             ) : (
               <Link
@@ -272,7 +305,7 @@ export default function OrdersPage() {
                 className="mt-5 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
               >
                 <Plus size={17} />
-                Create first order
+                {t.createFirstOrder}
               </Link>
             )}
           </div>
@@ -282,25 +315,25 @@ export default function OrdersPage() {
               <thead>
                 <tr className="border-b border-border bg-muted/60">
                   <th className="px-5 py-4 font-semibold text-muted-foreground">
-                    Order
+                    {t.orderNumber}
                   </th>
                   <th className="px-5 py-4 font-semibold text-muted-foreground">
-                    Shop
+                    {t.shop}
                   </th>
                   <th className="px-5 py-4 font-semibold text-muted-foreground">
-                    Items
+                    {t.items}
                   </th>
                   <th className="px-5 py-4 font-semibold text-muted-foreground">
-                    Total
+                    {t.total}
                   </th>
                   <th className="px-5 py-4 font-semibold text-muted-foreground">
-                    Date
+                    {t.date}
                   </th>
                   <th className="px-5 py-4 font-semibold text-muted-foreground">
-                    Status
+                    {t.status}
                   </th>
                   <th className="px-5 py-4 font-semibold text-muted-foreground">
-                    Action
+                    {t.actions}
                   </th>
                 </tr>
               </thead>
@@ -325,8 +358,10 @@ export default function OrdersPage() {
                         {order.customerName}
                       </p>
                       <p className="mt-1 text-xs text-muted-foreground">
-                        {order.items.length} product line
-                        {order.items.length === 1 ? "" : "s"}
+                        {order.items.length}{" "}
+                        {order.items.length === 1
+                          ? t.productLine
+                          : t.productLines}
                       </p>
                     </td>
 
@@ -345,15 +380,21 @@ export default function OrdersPage() {
                     </td>
 
                     <td className="px-5 py-4 text-muted-foreground">
-                      {new Date(order.createdAt).toLocaleDateString("en-IN")}
+                      {new Date(order.createdAt).toLocaleDateString(
+                        language === "mr"
+                          ? "mr-IN"
+                          : language === "hi"
+                            ? "hi-IN"
+                            : "en-IN",
+                      )}
                     </td>
 
                     <td className="px-5 py-4">
                       <div className="flex min-w-36 flex-col items-start gap-2">
                         <span
-                          className={`inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold capitalize ring-1 ring-inset ${statusStyles[order.status]}`}
+                          className={`inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ring-inset ${statusStyles[order.status]}`}
                         >
-                          {order.status}
+                          {statusLabels[order.status]}
                         </span>
 
                         <select
@@ -364,14 +405,22 @@ export default function OrdersPage() {
                               event.target.value as OrderStatus,
                             )
                           }
-                          aria-label={`Change status for ${order.orderNumber}`}
+                          aria-label={`${t.updateStatus}: ${order.orderNumber}`}
                           className="h-9 w-full rounded-lg border border-border bg-background px-2 text-xs text-foreground outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 dark:[color-scheme:dark]"
                         >
-                          <option value="pending">Pending</option>
-                          <option value="confirmed">Confirmed</option>
-                          <option value="dispatched">Dispatched</option>
-                          <option value="delivered">Delivered</option>
-                          <option value="cancelled">Cancelled</option>
+                          {(
+                            [
+                              "pending",
+                              "confirmed",
+                              "dispatched",
+                              "delivered",
+                              "cancelled",
+                            ] as OrderStatus[]
+                          ).map((status) => (
+                            <option key={status} value={status}>
+                              {statusLabels[status]}
+                            </option>
+                          ))}
                         </select>
                       </div>
                     </td>
@@ -380,8 +429,8 @@ export default function OrdersPage() {
                       <button
                         type="button"
                         onClick={() => handleDelete(order)}
-                        aria-label={`Delete ${order.orderNumber}`}
-                        title="Delete order"
+                        aria-label={`${t.delete}: ${order.orderNumber}`}
+                        title={t.deleteOrderAction}
                         className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-500"
                       >
                         <Trash2 size={15} />
@@ -397,13 +446,15 @@ export default function OrdersPage() {
         {ready && filteredOrders.length > 0 && (
           <div className="flex flex-col gap-2 border-t border-border bg-muted/30 px-5 py-4 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
             <span>
-              Showing {filteredOrders.length} of {orders.length} orders
+              {t.showing} {filteredOrders.length} {t.of} {orders.length}{" "}
+              {t.orders.toLowerCase()}
             </span>
+
             <Link
               href="/orders/new"
               className="inline-flex items-center gap-1.5 font-semibold text-primary hover:underline"
             >
-              Create another order
+              {t.createAnotherOrder}
               <ArrowUpRight size={14} />
             </Link>
           </div>

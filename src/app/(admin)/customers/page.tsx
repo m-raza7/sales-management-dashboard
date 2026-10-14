@@ -20,7 +20,13 @@ import {
   getCustomers,
 } from "@/features/customers/customer.service";
 
+import { useLanguage } from "@/components/providers/LanguageProvider";
+import { translations } from "@/lib/i18n/translations";
+
 export default function CustomersPage() {
+  const { language, mounted } = useLanguage();
+  const t = translations[language];
+
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [search, setSearch] = useState("");
   const [ready, setReady] = useState(false);
@@ -36,7 +42,7 @@ export default function CustomersPage() {
 
   function handleDelete(customer: Customer) {
     const confirmed = window.confirm(
-      `Are you sure you want to delete "${customer.shopName}"?`,
+      `${t.confirmDelete}: "${customer.shopName}"?`,
     );
 
     if (!confirmed) return;
@@ -58,6 +64,25 @@ export default function CustomersPage() {
     ].some((value) => value.toLowerCase().includes(query)),
   );
 
+  if (!mounted) {
+    return (
+      <div className="min-w-0 space-y-6 text-foreground">
+        <div className="h-24 animate-pulse rounded-2xl bg-muted" />
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {[1, 2].map((item) => (
+            <div
+              key={item}
+              className="h-28 animate-pulse rounded-2xl bg-muted"
+            />
+          ))}
+        </div>
+
+        <div className="h-72 animate-pulse rounded-2xl bg-muted" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-w-0 space-y-6 text-foreground sm:space-y-8">
       {/* Page heading */}
@@ -65,15 +90,15 @@ export default function CustomersPage() {
         <div className="min-w-0">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
             <Users size={15} className="text-gold" />
-            Sales management
+            {t.salesManagement}
           </div>
 
           <h1 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
-            Customers
+            {t.customers}
           </h1>
 
           <p className="mt-2 text-sm text-muted-foreground sm:text-base">
-            Manage your shops, shopkeepers and customer information.
+            {t.customersDescription}
           </p>
         </div>
 
@@ -82,7 +107,7 @@ export default function CustomersPage() {
           className="inline-flex min-h-11 w-fit shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <Plus size={18} />
-          Add customer
+          {t.addCustomer}
         </Link>
       </section>
 
@@ -92,7 +117,7 @@ export default function CustomersPage() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-sm font-medium text-muted-foreground">
-                Total customers
+                {t.totalCustomersLabel}
               </p>
 
               <p className="mt-3 text-3xl font-bold tracking-tight">
@@ -100,7 +125,7 @@ export default function CustomersPage() {
               </p>
 
               <p className="mt-1 text-xs text-muted-foreground">
-                All registered shops
+                {t.allRegisteredShops}
               </p>
             </div>
 
@@ -114,7 +139,7 @@ export default function CustomersPage() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-sm font-medium text-muted-foreground">
-                Search results
+                {t.searchResults}
               </p>
 
               <p className="mt-3 text-3xl font-bold tracking-tight">
@@ -122,7 +147,7 @@ export default function CustomersPage() {
               </p>
 
               <p className="mt-1 text-xs text-muted-foreground">
-                Shops matching your search
+                {t.shopsMatchingSearch}
               </p>
             </div>
 
@@ -138,15 +163,17 @@ export default function CustomersPage() {
         {/* Search toolbar */}
         <div className="flex flex-col justify-between gap-4 border-b border-border p-4 sm:flex-row sm:items-center sm:p-5">
           <div>
-            <h2 className="text-base font-semibold">Shop directory</h2>
+            <h2 className="text-base font-semibold">{t.shopDirectory}</h2>
+
             <p className="mt-1 text-sm text-muted-foreground">
-              View and manage your registered customers.
+              {t.customerDirectoryDescription}
             </p>
           </div>
 
           <div className="relative w-full sm:max-w-sm">
             <Search
               size={18}
+              aria-hidden="true"
               className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
             />
 
@@ -154,8 +181,8 @@ export default function CustomersPage() {
               type="search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search shop, owner, phone or city..."
-              aria-label="Search customers"
+              placeholder={t.searchCustomerPlaceholder}
+              aria-label={t.searchCustomers}
               className="h-11 w-full rounded-xl border border-border bg-background pl-10 pr-10 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20"
             />
 
@@ -163,7 +190,8 @@ export default function CustomersPage() {
               <button
                 type="button"
                 onClick={() => setSearch("")}
-                aria-label="Clear customer search"
+                aria-label={t.clearSearch}
+                title={t.clearSearch}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition hover:text-foreground"
               >
                 <X size={16} />
@@ -175,7 +203,7 @@ export default function CustomersPage() {
         {/* Table content */}
         {!ready ? (
           <div className="p-10 text-center text-sm text-muted-foreground">
-            Loading customers...
+            {t.loadingCustomers}
           </div>
         ) : filteredCustomers.length === 0 ? (
           <div className="px-5 py-14 text-center sm:py-16">
@@ -184,13 +212,11 @@ export default function CustomersPage() {
             </div>
 
             <h3 className="mt-4 text-base font-semibold">
-              {search ? "No customers found" : "No customers yet"}
+              {search ? t.noCustomersFound : t.noCustomersYet}
             </h3>
 
             <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-muted-foreground">
-              {search
-                ? "Try another shop name, owner name, phone number or city."
-                : "Add your first shop to start building your customer directory."}
+              {search ? t.tryAnotherCustomer : t.addFirstCustomerDescription}
             </p>
 
             {search ? (
@@ -199,7 +225,7 @@ export default function CustomersPage() {
                 onClick={() => setSearch("")}
                 className="mt-5 rounded-xl border border-border px-4 py-2.5 text-sm font-medium transition hover:bg-muted"
               >
-                Clear search
+                {t.clearSearch}
               </button>
             ) : (
               <Link
@@ -207,7 +233,7 @@ export default function CustomersPage() {
                 className="mt-5 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
               >
                 <Plus size={17} />
-                Add your first customer
+                {t.addFirstCustomer}
               </Link>
             )}
           </div>
@@ -217,19 +243,23 @@ export default function CustomersPage() {
               <thead>
                 <tr className="border-b border-border bg-muted/60">
                   <th className="px-5 py-4 font-semibold text-muted-foreground">
-                    Shop
+                    {t.shopName}
                   </th>
+
                   <th className="px-5 py-4 font-semibold text-muted-foreground">
-                    Owner
+                    {t.ownerName}
                   </th>
+
                   <th className="px-5 py-4 font-semibold text-muted-foreground">
-                    Phone
+                    {t.phone}
                   </th>
+
                   <th className="px-5 py-4 font-semibold text-muted-foreground">
-                    Location
+                    {t.location}
                   </th>
+
                   <th className="px-5 py-4 font-semibold text-muted-foreground">
-                    Actions
+                    {t.actions}
                   </th>
                 </tr>
               </thead>
@@ -251,8 +281,9 @@ export default function CustomersPage() {
                           <p className="max-w-[220px] truncate font-semibold text-foreground">
                             {customer.shopName}
                           </p>
+
                           <p className="mt-1 max-w-[220px] truncate text-xs text-muted-foreground">
-                            {customer.email || "No email provided"}
+                            {customer.email || t.noEmailProvided}
                           </p>
                         </div>
                       </div>
@@ -275,7 +306,7 @@ export default function CustomersPage() {
                       <span className="inline-flex items-center gap-2 text-muted-foreground">
                         <MapPin size={14} className="shrink-0" />
                         <span className="text-foreground">
-                          {customer.city || "Not specified"}
+                          {customer.city || t.notSpecified}
                         </span>
                       </span>
                     </td>
@@ -284,8 +315,8 @@ export default function CustomersPage() {
                       <div className="flex items-center gap-2">
                         <Link
                           href={`/customers/${customer.id}/edit`}
-                          aria-label={`Edit ${customer.shopName}`}
-                          title="Edit customer"
+                          aria-label={`${t.edit} ${customer.shopName}`}
+                          title={t.editCustomerAction}
                           className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition hover:border-ring hover:bg-primary/10 hover:text-primary"
                         >
                           <Pencil size={15} />
@@ -294,8 +325,8 @@ export default function CustomersPage() {
                         <button
                           type="button"
                           onClick={() => handleDelete(customer)}
-                          aria-label={`Delete ${customer.shopName}`}
-                          title="Delete customer"
+                          aria-label={`${t.delete} ${customer.shopName}`}
+                          title={t.deleteCustomerAction}
                           className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-500"
                         >
                           <Trash2 size={15} />
@@ -313,9 +344,11 @@ export default function CustomersPage() {
         {ready && filteredCustomers.length > 0 && (
           <div className="flex flex-col gap-2 border-t border-border bg-muted/30 px-5 py-4 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
             <span>
-              Showing {filteredCustomers.length} of {customers.length} customers
+              {t.showing} {filteredCustomers.length} {t.of} {customers.length}{" "}
+              {t.customers.toLowerCase()}
             </span>
-            <span>Customer information is saved in this browser.</span>
+
+            <span>{t.customerStorageNotice}</span>
           </div>
         )}
       </section>

@@ -19,6 +19,9 @@ import {
   getProducts,
 } from "@/features/products/product.service";
 
+import { useLanguage } from "@/components/providers/LanguageProvider";
+import { translations } from "@/lib/i18n/translations";
+
 const money = (value: number) =>
   new Intl.NumberFormat("en-IN", {
     style: "currency",
@@ -27,6 +30,11 @@ const money = (value: number) =>
   }).format(value);
 
 export default function ProductsPage() {
+  const { language, mounted } = useLanguage();
+
+  // Use the existing central translation dictionary.
+  const t = translations[language];
+
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState("");
   const [ready, setReady] = useState(false);
@@ -41,9 +49,7 @@ export default function ProductsPage() {
   }, [loadProducts]);
 
   function handleDelete(product: Product) {
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${product.name}"?`,
-    );
+    const confirmed = window.confirm(`${t.confirmDelete}: "${product.name}"?`);
 
     if (!confirmed) return;
 
@@ -67,6 +73,24 @@ export default function ProductsPage() {
   const activeCount = products.filter((product) => product.active).length;
   const inactiveCount = products.length - activeCount;
 
+  // Avoid displaying a different language before the provider mounts.
+  if (!mounted) {
+    return (
+      <div className="min-w-0 space-y-6 text-foreground">
+        <div className="h-24 animate-pulse rounded-2xl bg-muted" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          {[1, 2, 3].map((item) => (
+            <div
+              key={item}
+              className="h-28 animate-pulse rounded-2xl bg-muted"
+            />
+          ))}
+        </div>
+        <div className="h-72 animate-pulse rounded-2xl bg-muted" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-w-0 space-y-6 text-foreground sm:space-y-8">
       {/* Page heading */}
@@ -74,15 +98,15 @@ export default function ProductsPage() {
         <div className="min-w-0">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
             <Package size={15} className="text-gold" />
-            Sales management
+            {t.salesManagement}
           </div>
 
           <h1 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
-            Products
+            {t.products}
           </h1>
 
           <p className="mt-2 text-sm text-muted-foreground sm:text-base">
-            Manage products, packaging and selling prices.
+            {t.productsDescription}
           </p>
         </div>
 
@@ -91,7 +115,7 @@ export default function ProductsPage() {
           className="inline-flex min-h-11 w-fit shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <Plus size={18} />
-          Add product
+          {t.addProduct}
         </Link>
       </section>
 
@@ -101,7 +125,7 @@ export default function ProductsPage() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-sm font-medium text-muted-foreground">
-                Total products
+                {t.totalProducts}
               </p>
               <p className="mt-3 text-3xl font-bold">
                 {ready ? products.length : "—"}
@@ -117,7 +141,7 @@ export default function ProductsPage() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-sm font-medium text-muted-foreground">
-                Active products
+                {t.activeProducts}
               </p>
               <p className="mt-3 text-3xl font-bold">
                 {ready ? activeCount : "—"}
@@ -133,7 +157,7 @@ export default function ProductsPage() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-sm font-medium text-muted-foreground">
-                Inactive products
+                {t.inactiveProducts}
               </p>
               <p className="mt-3 text-3xl font-bold">
                 {ready ? inactiveCount : "—"}
@@ -150,15 +174,16 @@ export default function ProductsPage() {
       <section className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
         <div className="flex flex-col justify-between gap-4 border-b border-border p-4 sm:flex-row sm:items-center sm:p-5">
           <div>
-            <h2 className="text-base font-semibold">Product catalogue</h2>
+            <h2 className="text-base font-semibold">{t.productCatalogue}</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Manage product information and selling prices.
+              {t.catalogueDescription}
             </p>
           </div>
 
           <div className="relative w-full sm:max-w-sm">
             <Search
               size={18}
+              aria-hidden="true"
               className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
             />
 
@@ -166,8 +191,8 @@ export default function ProductsPage() {
               type="search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search product, SKU, brand or category..."
-              aria-label="Search products"
+              placeholder={t.searchProductPlaceholder}
+              aria-label={t.searchProducts}
               className="h-11 w-full rounded-xl border border-border bg-background pl-10 pr-10 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20"
             />
 
@@ -175,7 +200,8 @@ export default function ProductsPage() {
               <button
                 type="button"
                 onClick={() => setSearch("")}
-                aria-label="Clear product search"
+                aria-label={t.clearSearch}
+                title={t.clearSearch}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition hover:text-foreground"
               >
                 <X size={16} />
@@ -186,7 +212,7 @@ export default function ProductsPage() {
 
         {!ready ? (
           <div className="p-10 text-center text-sm text-muted-foreground">
-            Loading products...
+            {t.loadingProducts}
           </div>
         ) : filteredProducts.length === 0 ? (
           <div className="px-5 py-14 text-center sm:py-16">
@@ -195,13 +221,11 @@ export default function ProductsPage() {
             </div>
 
             <h3 className="mt-4 text-base font-semibold">
-              {search ? "No products found" : "No products yet"}
+              {search ? t.noProductsFound : t.noProductsYet}
             </h3>
 
             <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-muted-foreground">
-              {search
-                ? "Try another product name, SKU, brand or category."
-                : "Add your first product to start building your catalogue."}
+              {search ? t.tryAnotherProduct : t.addFirstProductDescription}
             </p>
 
             {search ? (
@@ -210,7 +234,7 @@ export default function ProductsPage() {
                 onClick={() => setSearch("")}
                 className="mt-5 rounded-xl border border-border px-4 py-2.5 text-sm font-medium transition hover:bg-muted"
               >
-                Clear search
+                {t.clearSearch}
               </button>
             ) : (
               <Link
@@ -218,7 +242,7 @@ export default function ProductsPage() {
                 className="mt-5 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
               >
                 <Plus size={17} />
-                Add your first product
+                {t.addFirstProduct}
               </Link>
             )}
           </div>
@@ -228,25 +252,25 @@ export default function ProductsPage() {
               <thead>
                 <tr className="border-b border-border bg-muted/60">
                   <th className="px-5 py-4 font-semibold text-muted-foreground">
-                    Product
+                    {t.product}
                   </th>
                   <th className="px-5 py-4 font-semibold text-muted-foreground">
-                    SKU
+                    {t.sku}
                   </th>
                   <th className="px-5 py-4 font-semibold text-muted-foreground">
-                    Category
+                    {t.category}
                   </th>
                   <th className="px-5 py-4 font-semibold text-muted-foreground">
-                    Size / Unit
+                    {t.sizeUnit}
                   </th>
                   <th className="px-5 py-4 font-semibold text-muted-foreground">
-                    Price
+                    {t.price}
                   </th>
                   <th className="px-5 py-4 font-semibold text-muted-foreground">
-                    Status
+                    {t.status}
                   </th>
                   <th className="px-5 py-4 font-semibold text-muted-foreground">
-                    Actions
+                    {t.actions}
                   </th>
                 </tr>
               </thead>
@@ -268,7 +292,7 @@ export default function ProductsPage() {
                             {product.name}
                           </p>
                           <p className="mt-1 max-w-[220px] truncate text-xs text-muted-foreground">
-                            {product.brand || "No brand specified"}
+                            {product.brand || t.noBrand}
                           </p>
                         </div>
                       </div>
@@ -305,7 +329,7 @@ export default function ProductsPage() {
                             product.active ? "bg-emerald-500" : "bg-gray-400"
                           }`}
                         />
-                        {product.active ? "Active" : "Inactive"}
+                        {product.active ? t.active : t.inactive}
                       </span>
                     </td>
 
@@ -313,8 +337,8 @@ export default function ProductsPage() {
                       <div className="flex items-center gap-2">
                         <Link
                           href={`/products/${product.id}/edit`}
-                          aria-label={`Edit ${product.name}`}
-                          title="Edit product"
+                          aria-label={`${t.edit} ${product.name}`}
+                          title={t.editProductAction}
                           className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition hover:border-ring hover:bg-primary/10 hover:text-primary"
                         >
                           <Pencil size={15} />
@@ -323,8 +347,8 @@ export default function ProductsPage() {
                         <button
                           type="button"
                           onClick={() => handleDelete(product)}
-                          aria-label={`Delete ${product.name}`}
-                          title="Delete product"
+                          aria-label={`${t.delete} ${product.name}`}
+                          title={t.deleteProductAction}
                           className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-500"
                         >
                           <Trash2 size={15} />
@@ -341,9 +365,10 @@ export default function ProductsPage() {
         {ready && filteredProducts.length > 0 && (
           <div className="flex flex-col gap-2 border-t border-border bg-muted/30 px-5 py-4 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
             <span>
-              Showing {filteredProducts.length} of {products.length} products
+              {t.showing} {filteredProducts.length} {t.of} {products.length}{" "}
+              {t.productsCount}
             </span>
-            <span>Product information is saved in this browser.</span>
+            <span>{t.localStorageNotice}</span>
           </div>
         )}
       </section>
