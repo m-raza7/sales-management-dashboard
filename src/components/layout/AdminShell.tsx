@@ -18,6 +18,7 @@ import {
   Users,
   Package,
   ShoppingCart,
+  Settings2,
 } from "lucide-react";
 
 import Sidebar from "./Sidebar";
@@ -170,165 +171,77 @@ export default function AdminShell({ children }: { children: ReactNode }) {
       <Sidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
 
       <div className="min-h-screen min-w-0 lg:pl-[272px]">
-        <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur-xl">
-          <div className="flex min-h-[76px] items-center gap-2 px-3 py-3 sm:gap-3 sm:px-6 lg:px-8">
+        {/* Header */}
+        <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-xl">
+          <div className="flex h-[68px] min-w-0 items-center gap-2 px-3 sm:gap-3 sm:px-5 lg:px-6">
             {/* Mobile menu */}
             <button
               type="button"
-              onClick={() => setMobileOpen(true)}
-              aria-label="Open navigation menu"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-card transition hover:bg-muted lg:hidden"
+              onClick={() => setMobileOpen((previous) => !previous)}
+              aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
+              aria-expanded={mobileOpen}
+              className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-foreground transition hover:bg-muted lg:hidden"
             >
-              <Menu size={20} />
+              {mobileOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
 
-            {/* Header title */}
+            {/* Workspace title */}
             <div className="min-w-0 flex-1">
-              <div className="hidden items-center gap-2 text-xs text-muted-foreground sm:flex">
-                <Sparkles size={14} className="text-[#B18A37]" />
-                <span>YOUR BUSINESS, BEAUTIFULLY ORGANIZED</span>
-              </div>
-
-              <div className="mt-1 text-sm font-semibold sm:text-base">
-                <span className="truncate">{t("workspace")}</span>
-              </div>
+              <p className="truncate text-sm font-bold text-foreground sm:text-base">
+                Sales Workspace
+              </p>
+              <p className="hidden truncate text-xs text-muted-foreground sm:block">
+                Manage your business
+              </p>
             </div>
 
-            {/* Search */}
-            <div ref={searchContainerRef} className="relative shrink-0">
-              <form
-                onSubmit={handleSearchSubmit}
-                role="search"
-                className={`flex h-10 items-center gap-2 rounded-xl border border-border bg-card px-3 text-card-foreground shadow-sm transition-all duration-200 focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/20 ${
-                  searchOpen
-                    ? "fixed left-3 right-3 top-[82px] z-50 sm:absolute sm:left-auto sm:right-0 sm:top-12 sm:w-80"
-                    : "w-10 justify-center md:w-64 lg:w-72"
-                }`}
+            {/* Desktop/tablet search: keep your existing search component here */}
+            <div className="hidden shrink-0 md:block">
+              {/* Move your existing searchContainerRef div here.
+          Keep the form, input, results, and handlers unchanged. */}
+            </div>
+
+            {/* Mobile settings menu */}
+            <details className="group relative shrink-0 md:hidden">
+              <summary
+                aria-label="Open search, language and appearance settings"
+                title="Search and settings"
+                className="flex size-10 cursor-pointer list-none items-center justify-center rounded-xl border border-border bg-card text-foreground transition hover:bg-muted [&::-webkit-details-marker]:hidden"
               >
-                <button
-                  type="button"
-                  aria-label="Open search"
-                  onClick={() => {
-                    setSearchOpen(true);
-                    requestAnimationFrame(() => {
-                      searchInputRef.current?.focus();
-                    });
-                  }}
-                  className="shrink-0 text-muted-foreground transition hover:text-primary"
-                >
-                  <Search size={17} aria-hidden="true" />
-                </button>
+                <Settings2 size={19} />
+              </summary>
 
-                <input
-                  ref={searchInputRef}
-                  value={search}
-                  onChange={(event) => {
-                    setSearch(event.target.value);
-                    setSearchOpen(true);
-                  }}
-                  onFocus={() => setSearchOpen(true)}
-                  placeholder={t("search")}
-                  aria-label="Search pages"
-                  aria-expanded={searchOpen}
-                  aria-controls="admin-search-results"
-                  className={`min-w-0 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground ${
-                    searchOpen ? "block" : "hidden md:block"
-                  }`}
-                />
-
-                {searchOpen && search.length > 0 && (
-                  <button
-                    type="button"
-                    aria-label="Clear search"
-                    onClick={() => {
-                      setSearch("");
-                      searchInputRef.current?.focus();
-                    }}
-                    className="shrink-0 rounded-md p-1 text-muted-foreground transition hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  >
-                    <X size={15} aria-hidden="true" />
-                  </button>
-                )}
-
-                {!searchOpen && (
-                  <kbd className="hidden shrink-0 rounded-md border border-border bg-background px-1.5 py-0.5 text-[10px] text-muted-foreground lg:block">
-                    Ctrl K
-                  </kbd>
-                )}
-              </form>
-
-              {/* Search results */}
-              {searchOpen && (
-                <div
-                  id="admin-search-results"
-                  className="fixed left-3 right-3 top-[130px] z-50 max-h-[65vh] overflow-y-auto overscroll-contain rounded-xl border border-border bg-popover p-2 text-popover-foreground shadow-xl sm:absolute sm:left-auto sm:right-0 sm:top-[52px] sm:w-80"
-                >
-                  <p className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    {search.trim() ? "Search results" : "Quick navigation"}
+              <div className="absolute right-0 top-12 z-50 w-[min(19rem,calc(100vw-1.5rem))] space-y-4 rounded-2xl border border-border bg-popover p-4 text-popover-foreground shadow-xl">
+                {/* Search on mobile */}
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Search pages
                   </p>
 
-                  {filteredResults.length === 0 ? (
-                    <div className="px-3 py-6 text-center">
-                      <Search
-                        size={22}
-                        aria-hidden="true"
-                        className="mx-auto text-muted-foreground"
-                      />
-
-                      <p className="mt-2 text-sm font-medium text-popover-foreground">
-                        No results found
-                      </p>
-
-                      <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                        Try customers, products, or orders.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-1">
-                      {filteredResults.map((item) => {
-                        const Icon = item.icon;
-
-                        return (
-                          <button
-                            key={item.href}
-                            type="button"
-                            onClick={() => navigateTo(item.href)}
-                            className="flex w-full min-w-0 items-center gap-3 rounded-lg px-3 py-3 text-left transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                          >
-                            <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                              <Icon size={17} aria-hidden="true" />
-                            </span>
-
-                            <span className="min-w-0 flex-1">
-                              <span className="block truncate text-sm font-medium text-popover-foreground">
-                                {item.label}
-                              </span>
-
-                              <span className="mt-0.5 block truncate text-xs text-muted-foreground">
-                                {item.description}
-                              </span>
-                            </span>
-
-                            <ArrowRight
-                              size={15}
-                              aria-hidden="true"
-                              className="shrink-0 text-muted-foreground"
-                            />
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-
-                  <div className="mt-2 flex items-center justify-between border-t border-border px-3 py-2 text-[10px] text-muted-foreground">
-                    <span>Navigate to a page</span>
-                    <span>Press Esc to close</span>
-                  </div>
+                  {/* Use your existing search form and results here.
+              Remove its desktop-only wrapper for this copy. */}
                 </div>
-              )}
-            </div>
-            {/* Language and theme controls */}
-            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+
+                <div className="h-px bg-border" />
+
+                {/* Language */}
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-sm font-medium">Language</span>
+                  <LanguageSwitcher />
+                </div>
+
+                <div className="h-px bg-border" />
+
+                {/* Theme */}
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-sm font-medium">Appearance</span>
+                  <ThemeToggle />
+                </div>
+              </div>
+            </details>
+
+            {/* Desktop/tablet language and theme */}
+            <div className="hidden shrink-0 items-center gap-2 md:flex">
               <LanguageSwitcher />
               <ThemeToggle />
             </div>
