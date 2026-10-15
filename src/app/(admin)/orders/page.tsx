@@ -12,6 +12,7 @@ import {
   IndianRupee,
   Package,
   ArrowUpRight,
+  Download,
 } from "lucide-react";
 
 import type { Order, OrderStatus } from "@/features/orders/types";
@@ -50,6 +51,7 @@ export default function OrdersPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [ready, setReady] = useState(false);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   const loadOrders = useCallback(() => {
     setOrders(getOrders());
@@ -74,6 +76,41 @@ export default function OrdersPage() {
 
     deleteOrder(order.id);
     loadOrders();
+  }
+
+  async function handleDownloadPdf(order: Order) {
+    if (downloadingId !== null) return;
+
+    setDownloadingId(order.id);
+
+    try {
+      const [{ pdf }, { default: OrderPdfDocument }] = await Promise.all([
+        import("@react-pdf/renderer"),
+        import("@/features/orders/components/OrderPdfDocument"),
+      ]);
+
+      const pdfDocument = <OrderPdfDocument order={order} />;
+      const blob = await pdf(pdfDocument).toBlob();
+
+      const url = URL.createObjectURL(blob);
+      const link = window.document.createElement("a");
+
+      const safeOrderNumber = order.orderNumber.replace(/[^a-zA-Z0-9_-]/g, "_");
+
+      link.href = url;
+      link.download = `Sales-Order-${safeOrderNumber}.pdf`;
+
+      window.document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (error) {
+      console.error("Failed to generate order PDF:", error);
+      window.alert("Unable to generate the PDF. Please try again.");
+    } finally {
+      setDownloadingId(null);
+    }
   }
 
   const query = search.trim().toLowerCase();
@@ -189,11 +226,9 @@ export default function OrdersPage() {
                 <p className="text-sm font-medium text-muted-foreground">
                   {label}
                 </p>
-
                 <p className="mt-3 break-words text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
                   {value}
                 </p>
-
                 <p className="mt-2 text-xs text-muted-foreground">{detail}</p>
               </div>
 
@@ -311,7 +346,7 @@ export default function OrdersPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[920px] border-collapse text-left text-sm">
+            <table className="w-full min-w-[1000px] border-collapse text-left text-sm">
               <thead>
                 <tr className="border-b border-border bg-muted/60">
                   <th className="px-5 py-4 font-semibold text-muted-foreground">
@@ -426,15 +461,33 @@ export default function OrdersPage() {
                     </td>
 
                     <td className="px-5 py-4">
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(order)}
-                        aria-label={`${t.delete}: ${order.orderNumber}`}
-                        title={t.deleteOrderAction}
-                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-500"
-                      >
-                        <Trash2 size={15} />
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleDownloadPdf(order)}
+                          disabled={downloadingId !== null}
+                          aria-label={`Download PDF for ${order.orderNumber}`}
+                          title="Download order PDF"
+                          className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 text-emerald-700 transition hover:bg-emerald-500/20 disabled:cursor-wait disabled:opacity-50 dark:text-emerald-300"
+                        >
+                          <Download size={15} />
+                          <span className="text-xs font-semibold">
+                            {downloadingId === order.id
+                              ? "Generating..."
+                              : "PDF"}
+                          </span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(order)}
+                          aria-label={`${t.delete}: ${order.orderNumber}`}
+                          title={t.deleteOrderAction}
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-500"
+                        >
+                          <Trash2 size={15} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
