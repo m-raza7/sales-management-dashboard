@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import ThemeProvider from "@/components/providers/ThemeProvider";
+import LocalAccessLock from "@/components/auth/LocalAccessLock";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -15,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <LocalAccessLock>
+          <ThemeProvider>{children}</ThemeProvider>
+        </LocalAccessLock>
       </body>
     </html>
   );
