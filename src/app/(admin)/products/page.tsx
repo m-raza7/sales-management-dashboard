@@ -22,22 +22,27 @@ import {
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import { translations } from "@/lib/i18n/translations";
 
-const money = (value: number) =>
-  new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    maximumFractionDigits: 2,
-  }).format(value);
-
 export default function ProductsPage() {
   const { language, mounted } = useLanguage();
-
-  // Use the existing central translation dictionary.
   const t = translations[language];
 
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState("");
   const [ready, setReady] = useState(false);
+
+  // Format currency according to the selected language.
+  const money = useCallback(
+    (value: number) =>
+      new Intl.NumberFormat(
+        language === "mr" ? "mr-IN" : language === "hi" ? "hi-IN" : "en-IN",
+        {
+          style: "currency",
+          currency: "INR",
+          maximumFractionDigits: 2,
+        },
+      ).format(value),
+    [language],
+  );
 
   const loadProducts = useCallback(() => {
     setProducts(getProducts());
@@ -49,7 +54,12 @@ export default function ProductsPage() {
   }, [loadProducts]);
 
   function handleDelete(product: Product) {
-    const confirmed = window.confirm(`${t.confirmDelete}: "${product.name}"?`);
+    const confirmMessage = t.deleteProductConfirm.replace(
+      "{name}",
+      product.name,
+    );
+
+    const confirmed = window.confirm(confirmMessage);
 
     if (!confirmed) return;
 
@@ -67,17 +77,22 @@ export default function ProductsPage() {
       product.brand,
       product.size,
       product.unit,
-    ].some((value) => value.toLowerCase().includes(query)),
+    ].some((value) =>
+      String(value ?? "")
+        .toLowerCase()
+        .includes(query),
+    ),
   );
 
   const activeCount = products.filter((product) => product.active).length;
   const inactiveCount = products.length - activeCount;
 
-  // Avoid displaying a different language before the provider mounts.
+  // Prevent displaying the wrong language before the provider mounts.
   if (!mounted) {
     return (
       <div className="min-w-0 space-y-6 text-foreground">
         <div className="h-24 animate-pulse rounded-2xl bg-muted" />
+
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {[1, 2, 3].map((item) => (
             <div
@@ -86,6 +101,7 @@ export default function ProductsPage() {
             />
           ))}
         </div>
+
         <div className="h-72 animate-pulse rounded-2xl bg-muted" />
       </div>
     );
@@ -131,6 +147,7 @@ export default function ProductsPage() {
                 {ready ? products.length : "—"}
               </p>
             </div>
+
             <div className="rounded-2xl bg-primary/10 p-3 text-primary">
               <Package size={23} />
             </div>
@@ -147,6 +164,7 @@ export default function ProductsPage() {
                 {ready ? activeCount : "—"}
               </p>
             </div>
+
             <div className="rounded-2xl bg-emerald-500/10 p-3 text-emerald-700 dark:text-emerald-300">
               <Boxes size={23} />
             </div>
@@ -163,6 +181,7 @@ export default function ProductsPage() {
                 {ready ? inactiveCount : "—"}
               </p>
             </div>
+
             <div className="rounded-2xl bg-[#D8B66A]/15 p-3 text-[#A47D27] dark:text-[#E4C57D]">
               <Tag size={23} />
             </div>

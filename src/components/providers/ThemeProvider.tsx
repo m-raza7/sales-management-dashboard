@@ -9,7 +9,7 @@ export default function ThemeProvider({ children }: { children: ReactNode }) {
     <NextThemeProvider
       attribute="class"
       defaultTheme="light"
-      enableSystem
+      enableSystem={false}
       storageKey="sales-management-theme"
       disableTransitionOnChange
     >

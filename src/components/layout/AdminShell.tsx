@@ -1,7 +1,9 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type FormEvent,
@@ -11,7 +13,6 @@ import { useRouter } from "next/navigation";
 import {
   Menu,
   Search,
-  Sparkles,
   X,
   ArrowRight,
   LayoutDashboard,
@@ -32,6 +33,12 @@ type SearchItem = {
   href: string;
   icon: typeof LayoutDashboard;
   keywords: string[];
+};
+
+type SearchResultsProps = {
+  results: SearchItem[];
+  onNavigate: (href: string) => void;
+  onClose: () => void;
 };
 
 const searchItems: SearchItem[] = [
@@ -86,6 +93,70 @@ const searchItems: SearchItem[] = [
   },
 ];
 
+function SearchResults({ results, onNavigate, onClose }: SearchResultsProps) {
+  return (
+    <div className="absolute left-0 right-0 top-full z-[60] mt-2 overflow-hidden rounded-2xl border border-border bg-popover text-popover-foreground shadow-xl">
+      <div className="flex items-center justify-between border-b border-border px-4 py-3">
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          Search results
+        </p>
+
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close search results"
+          className="rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+        >
+          <X size={15} />
+        </button>
+      </div>
+
+      <div className="max-h-80 overflow-y-auto p-2">
+        {results.length > 0 ? (
+          results.map((item) => {
+            const Icon = item.icon;
+
+            return (
+              <button
+                key={item.href}
+                type="button"
+                onClick={() => onNavigate(item.href)}
+                className="flex w-full items-center gap-3 rounded-xl p-3 text-left transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <Icon size={18} />
+                </span>
+
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-semibold">
+                    {item.label}
+                  </span>
+                  <span className="mt-1 block truncate text-xs text-muted-foreground">
+                    {item.description}
+                  </span>
+                </span>
+
+                <ArrowRight
+                  size={16}
+                  className="shrink-0 text-muted-foreground"
+                />
+              </button>
+            );
+          })
+        ) : (
+          <p className="px-3 py-8 text-center text-sm text-muted-foreground">
+            No results found
+          </p>
+        )}
+      </div>
+
+      <div className="border-t border-border px-4 py-2 text-xs text-muted-foreground">
+        Press Enter to open the first result
+      </div>
+    </div>
+  );
+}
+
 export default function AdminShell({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { t } = useLanguage();
@@ -93,88 +164,150 @@ export default function AdminShell({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const searchContainerRef = useRef<HTMLDivElement>(null);
-  const searchInputRef = useRef<HTMLInputElement>(null);
+  const mobileSettingsRef = useRef<HTMLDetailsElement>(null);
+  const desktopSearchInputRef = useRef<HTMLInputElement>(null);
+  const mobileSearchInputRef = useRef<HTMLInputElement>(null);
 
-  const filteredResults = searchItems.filter((item) => {
-    const query = search.trim().toLowerCase();
+  const query = search.trim().toLowerCase();
 
-    if (!query) return true;
+  const filteredResults = useMemo(
+    () =>
+      searchItems.filter((item) =>
+        [item.label, item.description, ...item.keywords].some((value) =>
+          value.toLowerCase().includes(query),
+        ),
+      ),
+    [query],
+  );
 
-    return [item.label, item.description, ...item.keywords].some((value) =>
-      value.toLowerCase().includes(query),
-    );
-  });
-
-  function navigateTo(href: string) {
+  const closeSettings = useCallback(() => {
+    setSettingsOpen(false);
     setSearchOpen(false);
-    setSearch("");
-    setMobileOpen(false);
-    router.push(href);
-  }
+  }, []);
 
-  function handleSearchSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  const closeSearch = useCallback(() => {
+    setSearchOpen(false);
+  }, []);
 
-    if (filteredResults.length > 0) {
-      navigateTo(filteredResults[0].href);
+  const focusSearch = useCallback(() => {
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+
+    if (isMobile) {
+      setSettingsOpen(true);
     }
-  }
+
+    setSearchOpen(true);
+
+    window.requestAnimationFrame(() => {
+      if (isMobile) {
+        mobileSearchInputRef.current?.focus();
+      } else {
+        desktopSearchInputRef.current?.focus();
+      }
+    });
+  }, []);
+
+  const navigateTo = useCallback(
+    (href: string) => {
+      setSearchOpen(false);
+      setSearch("");
+      setSettingsOpen(false);
+      setMobileOpen(false);
+      router.push(href);
+    },
+    [router],
+  );
+
+  const handleSearchSubmit = useCallback(
+    (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+
+      if (filteredResults.length > 0) {
+        navigateTo(filteredResults[0].href);
+      }
+    },
+    [filteredResults, navigateTo],
+  );
 
   useEffect(() => {
-    function handleOutsideClick(event: MouseEvent) {
-      if (
-        searchContainerRef.current &&
-        !searchContainerRef.current.contains(event.target as Node)
-      ) {
+    // Keep the native details element synchronized with React state.
+    if (mobileSettingsRef.current) {
+      mobileSettingsRef.current.open = settingsOpen;
+    }
+  }, [settingsOpen]);
+
+  useEffect(() => {
+    function handleOutsideClick(event: PointerEvent) {
+      const target = event.target;
+
+      if (!(target instanceof Node)) {
+        return;
+      }
+
+      const insideMobileSettings =
+        mobileSettingsRef.current?.contains(target) ?? false;
+
+      const insideDesktopSearch =
+        searchContainerRef.current?.contains(target) ?? false;
+
+      if (!insideMobileSettings) {
+        setSettingsOpen(false);
+      }
+
+      if (!insideDesktopSearch && !insideMobileSettings) {
         setSearchOpen(false);
       }
     }
 
     function handleKeyboard(event: KeyboardEvent) {
-      const target = event.target as HTMLElement | null;
+      const target = event.target;
+
       const isTyping =
-        target?.tagName === "INPUT" ||
-        target?.tagName === "TEXTAREA" ||
-        target?.isContentEditable;
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target instanceof HTMLSelectElement ||
+        (target instanceof HTMLElement && target.isContentEditable);
 
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
-        setSearchOpen(true);
-        searchInputRef.current?.focus();
+        focusSearch();
+        return;
       }
 
       if (event.key === "/" && !isTyping) {
         event.preventDefault();
-        setSearchOpen(true);
-        searchInputRef.current?.focus();
+        focusSearch();
+        return;
       }
 
       if (event.key === "Escape") {
-        setSearchOpen(false);
-        searchInputRef.current?.blur();
+        closeSettings();
+        desktopSearchInputRef.current?.blur();
+        mobileSearchInputRef.current?.blur();
+        setMobileOpen(false);
       }
     }
 
-    document.addEventListener("mousedown", handleOutsideClick);
+    document.addEventListener("pointerdown", handleOutsideClick);
     document.addEventListener("keydown", handleKeyboard);
 
     return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("pointerdown", handleOutsideClick);
       document.removeEventListener("keydown", handleKeyboard);
     };
-  }, []);
+  }, [closeSettings, focusSearch]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Sidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
 
       <div className="min-h-screen min-w-0 lg:pl-[272px]">
-        {/* Header */}
         <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-xl">
-          <div className="flex h-[68px] min-w-0 items-center gap-2 px-3 sm:gap-3 sm:px-5 lg:px-6">
-            {/* Mobile menu */}
+          <div className="flex h-[68px] min-w-0 items-center gap-3 px-3 sm:px-5 lg:px-6">
+            {/* Mobile navigation */}
             <button
               type="button"
               onClick={() => setMobileOpen((previous) => !previous)}
@@ -195,59 +328,15 @@ export default function AdminShell({ children }: { children: ReactNode }) {
               </p>
             </div>
 
-            {/* Desktop/tablet search: keep your existing search component here */}
-            <div className="hidden shrink-0 md:block">
-              {/* Move your existing searchContainerRef div here.
-          Keep the form, input, results, and handlers unchanged. */}
-            </div>
-
-            {/* Mobile settings menu */}
-            <details className="group relative shrink-0 md:hidden">
-              <summary
-                aria-label="Open search, language and appearance settings"
-                title="Search and settings"
-                className="flex size-10 cursor-pointer list-none items-center justify-center rounded-xl border border-border bg-card text-foreground transition hover:bg-muted [&::-webkit-details-marker]:hidden"
-              >
-                <Settings2 size={19} />
-              </summary>
-
-              <div className="absolute right-0 top-12 z-50 w-[min(19rem,calc(100vw-1.5rem))] space-y-4 rounded-2xl border border-border bg-popover p-4 text-popover-foreground shadow-xl">
-                {/* Search on mobile */}
-                <div className="space-y-2">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    Search pages
-                  </p>
-
-                  {/* Use your existing search form and results here.
-              Remove its desktop-only wrapper for this copy. */}
-                </div>
-
-                <div className="h-px bg-border" />
-
-                {/* Language */}
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-sm font-medium">Language</span>
-                  <LanguageSwitcher />
-                </div>
-
-                <div className="h-px bg-border" />
-
-                {/* Theme */}
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-sm font-medium">Appearance</span>
-                  <ThemeToggle />
-                </div>
-              </div>
-            </details>
-
-            {/* Desktop/tablet language and theme */}
-            <div className="hidden shrink-0 items-center gap-2 md:flex">
+            {/* Language dropdown and theme toggle */}
+            <div className="flex shrink-0 items-center gap-2">
               <LanguageSwitcher />
               <ThemeToggle />
             </div>
           </div>
         </header>
 
+        {/* Main content */}
         <main className="mx-auto w-full max-w-[1600px] p-4 sm:p-6 lg:p-8">
           {children}
 
