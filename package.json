@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/core": "^8.5.3",
     "@hookform/resolvers": "^5.9.1",
     "@react-pdf/renderer": "^4.9.0",
     "@tanstack/react-table": "^9.3.1",
@@ -29,6 +31,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.5.3",
     "@playwright/test": "^1.64.0",
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^20",
