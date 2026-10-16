@@ -21,6 +21,7 @@ import {
   ShoppingCart,
   Settings2,
 } from "lucide-react";
+import Link from "next/link";
 
 import Sidebar from "./Sidebar";
 import ThemeToggle from "@/components/common/ThemeToggle";

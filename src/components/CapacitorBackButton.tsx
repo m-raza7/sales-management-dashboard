@@ -10,33 +10,36 @@ export default function CapacitorBackButton() {
 
   useEffect(() => {
     let listener: PluginListenerHandle | undefined;
-    let active = true;
+    let disposed = false;
 
-    const setupBackButton = async () => {
+    async function setupBackButton() {
       try {
         const handle = await CapacitorApp.addListener(
           "backButton",
           ({ canGoBack }) => {
-            if (canGoBack && window.history.length > 1) {
+            if (canGoBack) {
+              // Navigate to the previous page.
               router.back();
             }
+
+            // If there is no previous page, do not exit the app.
           },
         );
 
-        if (active) {
-          listener = handle;
-        } else {
+        if (disposed) {
           await handle.remove();
+        } else {
+          listener = handle;
         }
       } catch (error) {
-        console.error("Back button setup failed:", error);
+        console.error("Failed to set up Android back button:", error);
       }
-    };
+    }
 
     void setupBackButton();
 
     return () => {
-      active = false;
+      disposed = true;
       void listener?.remove();
     };
   }, [router]);
