@@ -314,14 +314,14 @@ export default function AdminShell({ children }: { children: ReactNode }) {
               onClick={() => setMobileOpen((previous) => !previous)}
               aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
               aria-expanded={mobileOpen}
-              className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-foreground transition hover:bg-muted lg:hidden"
+              className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-foreground transition-colors hover:bg-muted lg:hidden"
             >
               {mobileOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
 
-            {/* Workspace title */}
+            {/* Page title — no duplicate logo */}
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-bold text-foreground sm:text-base">
+              <p className="truncate text-sm font-bold tracking-tight text-foreground sm:text-base">
                 Sales Workspace
               </p>
               <p className="hidden truncate text-xs text-muted-foreground sm:block">
@@ -330,7 +330,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
             </div>
 
             {/* Language dropdown and theme toggle */}
-            <div className="flex shrink-0 items-center gap-2">
+            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
               <LanguageSwitcher />
               <ThemeToggle />
             </div>

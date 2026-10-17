@@ -1,9 +1,25 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowLeft, Package, Sparkles, ShieldCheck } from "lucide-react";
 
 import ProductForm from "@/features/products/ProductForm";
+import { useLanguage } from "@/components/providers/LanguageProvider";
+import { translations } from "@/lib/i18n/translations";
 
 export default function NewProductPage() {
+  const { language, mounted } = useLanguage();
+  const t = translations[language];
+
+  if (!mounted) {
+    return (
+      <section className="mx-auto w-full max-w-4xl space-y-6">
+        <div className="h-24 animate-pulse rounded-2xl bg-muted" />
+        <div className="h-96 animate-pulse rounded-2xl bg-muted" />
+      </section>
+    );
+  }
+
   return (
     <section className="mx-auto w-full max-w-4xl space-y-6 text-foreground sm:space-y-8">
       {/* Page heading */}
@@ -14,21 +30,20 @@ export default function NewProductPage() {
             className="mb-4 inline-flex items-center gap-2 rounded-lg text-sm font-medium text-muted-foreground transition hover:text-foreground"
           >
             <ArrowLeft size={16} />
-            Back to products
+            {t.backToProducts}
           </Link>
 
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
             <Sparkles size={15} className="text-gold" />
-            Sales management
+            {t.salesManagement}
           </div>
 
           <h1 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
-            Add product
+            {t.addProduct}
           </h1>
 
           <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground sm:text-base">
-            Add a product to your catalogue, set its packaging and selling
-            price, and make it available when creating orders.
+            {t.addProductDescription}
           </p>
         </div>
 
@@ -51,13 +66,11 @@ export default function NewProductPage() {
 
         <div>
           <p className="text-sm font-semibold text-foreground">
-            Product information
+            {t.productInformation}
           </p>
 
           <p className="mt-1 text-sm leading-6 text-muted-foreground">
-            Check the product name, SKU, packaging and selling price before
-            saving. Product records are stored in this browser and are not
-            automatically synced across devices.
+            {t.productInformationDescription}
           </p>
         </div>
       </div>

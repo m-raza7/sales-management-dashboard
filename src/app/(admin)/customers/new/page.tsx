@@ -1,9 +1,25 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowLeft, Store, Sparkles, ShieldCheck } from "lucide-react";
 
 import CustomerForm from "@/features/customers/CustomerForm";
+import { useLanguage } from "@/components/providers/LanguageProvider";
+import { translations } from "@/lib/i18n/translations";
 
 export default function NewCustomerPage() {
+  const { language, mounted } = useLanguage();
+  const t = translations[language];
+
+  if (!mounted) {
+    return (
+      <section className="mx-auto w-full max-w-4xl space-y-6">
+        <div className="h-24 animate-pulse rounded-2xl bg-muted" />
+        <div className="h-96 animate-pulse rounded-2xl bg-muted" />
+      </section>
+    );
+  }
+
   return (
     <section className="mx-auto w-full max-w-4xl space-y-6 text-foreground sm:space-y-8">
       {/* Page heading */}
@@ -14,21 +30,20 @@ export default function NewCustomerPage() {
             className="mb-4 inline-flex items-center gap-2 rounded-lg text-sm font-medium text-muted-foreground transition hover:text-foreground"
           >
             <ArrowLeft size={16} />
-            Back to customers
+            {t.backToCustomers}
           </Link>
 
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
             <Sparkles size={15} className="text-gold" />
-            Sales management
+            {t.salesManagement}
           </div>
 
           <h1 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
-            Add customer
+            {t.addCustomer}
           </h1>
 
           <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground sm:text-base">
-            Register a new shop, save the shopkeeper's details, and make the
-            customer available when creating orders.
+            {t.addCustomerDescription}
           </p>
         </div>
 
@@ -51,13 +66,11 @@ export default function NewCustomerPage() {
 
         <div>
           <p className="text-sm font-semibold text-foreground">
-            Customer information
+            {t.customerInformation}
           </p>
 
           <p className="mt-1 text-sm leading-6 text-muted-foreground">
-            Enter accurate shop and contact details. Customer records are
-            currently saved in this browser's local storage and are not
-            automatically synced to other devices.
+            {t.customerInformationDescription}
           </p>
         </div>
       </div>

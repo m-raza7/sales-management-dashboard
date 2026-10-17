@@ -17,6 +17,8 @@ import {
 
 import type { Product } from "./types";
 import { addProduct, updateProduct } from "./product.service";
+import { useLanguage } from "@/components/providers/LanguageProvider";
+import { translations } from "@/lib/i18n/translations";
 
 type ProductFields = Omit<Product, "id" | "createdAt">;
 
@@ -38,19 +40,21 @@ const inputClass =
 const labelClass =
   "block min-w-0 space-y-2 text-sm font-medium text-foreground";
 
-const units = [
-  { value: "piece", label: "Piece" },
-  { value: "box", label: "Box" },
-  { value: "bottle", label: "Bottle" },
-  { value: "can", label: "Can" },
-  { value: "litre", label: "Litre" },
-  { value: "kg", label: "Kilogram" },
-  { value: "packet", label: "Packet" },
-  { value: "dozen", label: "Dozen" },
-];
+const unitKeys = [
+  { value: "piece", key: "productFormUnitPiece" },
+  { value: "box", key: "productFormUnitBox" },
+  { value: "bottle", key: "productFormUnitBottle" },
+  { value: "can", key: "productFormUnitCan" },
+  { value: "litre", key: "productFormUnitLitre" },
+  { value: "kg", key: "productFormUnitKilogram" },
+  { value: "packet", key: "productFormUnitPacket" },
+  { value: "dozen", key: "productFormUnitDozen" },
+] as const;
 
 export default function ProductForm({ product }: { product?: Product }) {
   const router = useRouter();
+  const { language, mounted } = useLanguage();
+  const t = translations[language];
 
   const [form, setForm] = useState<ProductFields>(initialForm);
   const [error, setError] = useState("");
@@ -60,7 +64,6 @@ export default function ProductForm({ product }: { product?: Product }) {
     if (!product) return;
 
     const { id: _id, createdAt: _createdAt, ...fields } = product;
-
     setForm(fields);
   }, [product]);
 
@@ -72,6 +75,8 @@ export default function ProductForm({ product }: { product?: Product }) {
       ...previous,
       [field]: value,
     }));
+
+    if (error) setError("");
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -82,12 +87,12 @@ export default function ProductForm({ product }: { product?: Product }) {
     const price = Number(form.price);
 
     if (!name) {
-      setError("Product name is required.");
+      setError(t.productFormNameRequired);
       return;
     }
 
     if (!Number.isFinite(price) || price < 0) {
-      setError("Please enter a valid, non-negative selling price.");
+      setError(t.productFormInvalidPrice);
       return;
     }
 
@@ -114,9 +119,15 @@ export default function ProductForm({ product }: { product?: Product }) {
       router.push("/products");
       router.refresh();
     } catch {
-      setError("Unable to save the product. Please try again.");
+      setError(t.productFormSaveError);
       setSaving(false);
     }
+  }
+
+  if (!mounted) {
+    return (
+      <div className="min-h-96 animate-pulse rounded-2xl border border-border bg-card" />
+    );
   }
 
   return (
@@ -133,20 +144,20 @@ export default function ProductForm({ product }: { product?: Product }) {
 
           <div className="min-w-0">
             <h2 className="text-lg font-bold tracking-tight sm:text-xl">
-              {product ? "Edit product" : "Product details"}
+              {product ? t.productFormEditProduct : t.productFormDetails}
             </h2>
 
             <p className="mt-1 text-sm leading-6 text-muted-foreground">
               {product
-                ? "Update your product information and catalogue settings."
-                : "Add a new product with its pricing, packaging, and availability."}
+                ? t.productFormEditDescription
+                : t.productFormAddDescription}
             </p>
           </div>
         </div>
 
         <div className="inline-flex w-fit items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium text-muted-foreground">
           <Sparkles size={14} className="text-[var(--gold)]" />
-          Product catalogue
+          {t.productFormCatalogue}
         </div>
       </div>
 
@@ -167,50 +178,53 @@ export default function ProductForm({ product }: { product?: Product }) {
       <section className="space-y-4">
         <div className="flex items-center gap-2">
           <Tag size={17} className="text-primary" />
-          <h3 className="text-sm font-semibold">Basic information</h3>
+          <h3 className="text-sm font-semibold">
+            {t.productFormBasicInformation}
+          </h3>
         </div>
 
         <div className="grid min-w-0 grid-cols-1 gap-5 sm:grid-cols-2">
           <label className={labelClass}>
-            Product name <span className="text-[var(--danger)]">*</span>
+            {t.productFormName}
+            <span className="text-[var(--danger)]">*</span>
             <input
               className={inputClass}
               value={form.name}
               onChange={(e) => updateField("name", e.target.value)}
               required
               maxLength={120}
-              placeholder="Interior Wall Paint"
+              placeholder={t.productFormNamePlaceholder}
               autoComplete="off"
             />
           </label>
 
           <label className={labelClass}>
-            SKU / Product code
+            {t.productFormSku}
             <input
               className={inputClass}
               value={form.sku}
               onChange={(e) => updateField("sku", e.target.value)}
               maxLength={60}
-              placeholder="PAINT-001"
+              placeholder={t.productFormSkuPlaceholder}
               autoComplete="off"
             />
           </label>
 
           <label className={labelClass}>
-            Category
+            {t.productFormCategory}
             <input
               className={inputClass}
               value={form.category}
               onChange={(e) => updateField("category", e.target.value)}
               maxLength={80}
-              placeholder="Paint, beverages, hardware..."
+              placeholder={t.productFormCategoryPlaceholder}
             />
           </label>
 
           <label className={labelClass}>
             <span className="flex items-center gap-2">
               <Building2 size={15} className="text-muted-foreground" />
-              Brand
+              {t.productFormBrand}
             </span>
 
             <input
@@ -218,7 +232,7 @@ export default function ProductForm({ product }: { product?: Product }) {
               value={form.brand}
               onChange={(e) => updateField("brand", e.target.value)}
               maxLength={80}
-              placeholder="Brand name"
+              placeholder={t.productFormBrandPlaceholder}
             />
           </label>
         </div>
@@ -230,14 +244,16 @@ export default function ProductForm({ product }: { product?: Product }) {
       <section className="space-y-4">
         <div className="flex items-center gap-2">
           <IndianRupee size={17} className="text-primary" />
-          <h3 className="text-sm font-semibold">Pricing and packaging</h3>
+          <h3 className="text-sm font-semibold">
+            {t.productFormPricingPackaging}
+          </h3>
         </div>
 
         <div className="grid min-w-0 grid-cols-1 gap-5 sm:grid-cols-2">
           <label className={labelClass}>
             <span className="flex items-center gap-2">
               <Ruler size={15} className="text-muted-foreground" />
-              Size / packaging
+              {t.productFormSize}
             </span>
 
             <input
@@ -245,27 +261,31 @@ export default function ProductForm({ product }: { product?: Product }) {
               value={form.size}
               onChange={(e) => updateField("size", e.target.value)}
               maxLength={80}
-              placeholder="1 litre, 20 litre, 250 ml..."
+              placeholder={t.productFormSizePlaceholder}
             />
           </label>
 
           <label className={labelClass}>
-            Unit
+            {t.productFormUnit}
             <select
               className={`${inputClass} dark:[color-scheme:dark]`}
               value={form.unit}
               onChange={(e) => updateField("unit", e.target.value)}
             >
-              {units.map((unit) => (
+              {unitKeys.map((unit) => (
                 <option key={unit.value} value={unit.value}>
-                  {unit.label}
+                  {t[unit.key]}
                 </option>
               ))}
             </select>
           </label>
 
           <label className={labelClass}>
-            Selling price (₹) <span className="text-[var(--danger)]">*</span>
+            <span>
+              {t.productFormSellingPrice}{" "}
+              <span className="text-[var(--danger)]">*</span>
+            </span>
+
             <div className="relative">
               <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm font-semibold text-muted-foreground">
                 ₹
@@ -288,8 +308,9 @@ export default function ProductForm({ product }: { product?: Product }) {
                 placeholder="0.00"
               />
             </div>
+
             <span className="text-xs font-normal text-muted-foreground">
-              Enter the selling price per selected unit.
+              {t.productFormPriceHint}
             </span>
           </label>
 
@@ -312,13 +333,13 @@ export default function ProductForm({ product }: { product?: Product }) {
                         : "text-muted-foreground"
                     }
                   />
-                  Available for orders
+                  {t.productFormAvailable}
                 </span>
 
                 <span className="mt-1 block text-xs leading-5 text-muted-foreground">
                   {form.active
-                    ? "Customers can order this product."
-                    : "This product will be unavailable for new orders."}
+                    ? t.productFormActiveDescription
+                    : t.productFormInactiveDescription}
                 </span>
               </span>
             </label>
@@ -332,22 +353,30 @@ export default function ProductForm({ product }: { product?: Product }) {
       <section className="space-y-4">
         <div className="flex items-center gap-2">
           <FileText size={17} className="text-primary" />
-          <h3 className="text-sm font-semibold">Additional details</h3>
+          <h3 className="text-sm font-semibold">
+            {t.productFormAdditionalDetails}
+          </h3>
         </div>
 
         <label className={labelClass}>
-          Description{" "}
-          <span className="font-normal text-muted-foreground">(optional)</span>
+          <span>
+            {t.productFormDescription}{" "}
+            <span className="font-normal text-muted-foreground">
+              ({t.productFormOptional})
+            </span>
+          </span>
+
           <textarea
             className={`${inputClass} min-h-28 resize-y`}
             rows={4}
             value={form.description}
             onChange={(e) => updateField("description", e.target.value)}
             maxLength={1000}
-            placeholder="Describe the product, its features, or other useful details..."
+            placeholder={t.productFormDescriptionPlaceholder}
           />
+
           <span className="text-right text-xs font-normal text-muted-foreground">
-            {form.description.length}/1000 characters
+            {form.description.length}/1000 {t.productFormCharacters}
           </span>
         </label>
       </section>
@@ -360,7 +389,7 @@ export default function ProductForm({ product }: { product?: Product }) {
           className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background px-5 py-3 text-sm font-semibold text-foreground transition hover:bg-muted sm:w-auto"
         >
           <ArrowLeft size={16} />
-          Cancel
+          {t.productFormCancel}
         </button>
 
         <button
@@ -369,7 +398,11 @@ export default function ProductForm({ product }: { product?: Product }) {
           className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
         >
           <Save size={17} />
-          {saving ? "Saving..." : product ? "Save changes" : "Save product"}
+          {saving
+            ? t.productFormSaving
+            : product
+              ? t.productFormSaveChanges
+              : t.productFormSaveProduct}
         </button>
       </div>
     </form>

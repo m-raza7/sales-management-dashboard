@@ -16,6 +16,8 @@ import {
 
 import type { Customer } from "./types";
 import { addCustomer, updateCustomer } from "./customer.service";
+import { useLanguage } from "@/components/providers/LanguageProvider";
+import { translations } from "@/lib/i18n/translations";
 
 type CustomerFormProps = {
   customer?: Customer;
@@ -43,6 +45,8 @@ const labelClass = "block space-y-2 text-sm font-medium text-foreground";
 
 export default function CustomerForm({ customer }: CustomerFormProps) {
   const router = useRouter();
+  const { language, mounted } = useLanguage();
+  const t = translations[language];
 
   const [form, setForm] = useState<CustomerFields>(emptyForm);
   const [error, setError] = useState("");
@@ -87,22 +91,22 @@ export default function CustomerForm({ customer }: CustomerFormProps) {
     };
 
     if (!cleanedForm.shopName) {
-      setError("Shop name is required.");
+      setError(t.shopNameRequired);
       return;
     }
 
     if (!cleanedForm.ownerName) {
-      setError("Owner name is required.");
+      setError(t.ownerNameRequired);
       return;
     }
 
     if (!cleanedForm.phone) {
-      setError("Phone number is required.");
+      setError(t.phoneRequired);
       return;
     }
 
     if (!/^[+\d\s()-]{7,20}$/.test(cleanedForm.phone)) {
-      setError("Enter a valid phone number.");
+      setError(t.validPhoneRequired);
       return;
     }
 
@@ -110,7 +114,7 @@ export default function CustomerForm({ customer }: CustomerFormProps) {
       cleanedForm.pincode &&
       !/^[a-zA-Z0-9 -]{3,12}$/.test(cleanedForm.pincode)
     ) {
-      setError("Enter a valid PIN or postal code.");
+      setError(t.validPincodeRequired);
       return;
     }
 
@@ -122,6 +126,12 @@ export default function CustomerForm({ customer }: CustomerFormProps) {
 
     router.push("/customers");
     router.refresh();
+  }
+
+  if (!mounted) {
+    return (
+      <div className="min-h-96 animate-pulse rounded-2xl border border-border bg-card" />
+    );
   }
 
   return (
@@ -137,12 +147,11 @@ export default function CustomerForm({ customer }: CustomerFormProps) {
 
         <div className="min-w-0">
           <h2 className="text-lg font-semibold">
-            {customer ? "Edit customer" : "Shop details"}
+            {customer ? t.editCustomer : t.shopDetails}
           </h2>
 
           <p className="mt-1 text-sm leading-6 text-muted-foreground">
-            Enter the shop and contact information. Fields marked with * are
-            required.
+            {t.customerFormDescription}
           </p>
         </div>
       </div>
@@ -163,7 +172,7 @@ export default function CustomerForm({ customer }: CustomerFormProps) {
         <label className={labelClass}>
           <span className="flex items-center gap-2">
             <Store size={15} className="text-muted-foreground" />
-            Shop name *
+            {t.shopName} *
           </span>
 
           <input
@@ -174,14 +183,14 @@ export default function CustomerForm({ customer }: CustomerFormProps) {
             maxLength={120}
             autoComplete="organization"
             className={inputClass}
-            placeholder="ABC General Store"
+            placeholder={t.shopNamePlaceholder}
           />
         </label>
 
         <label className={labelClass}>
           <span className="flex items-center gap-2">
             <UserRound size={15} className="text-muted-foreground" />
-            Owner name *
+            {t.ownerName} *
           </span>
 
           <input
@@ -192,14 +201,14 @@ export default function CustomerForm({ customer }: CustomerFormProps) {
             maxLength={120}
             autoComplete="name"
             className={inputClass}
-            placeholder="Shop owner's name"
+            placeholder={t.ownerNamePlaceholder}
           />
         </label>
 
         <label className={labelClass}>
           <span className="flex items-center gap-2">
             <Phone size={15} className="text-muted-foreground" />
-            Phone number *
+            {t.phone} *
           </span>
 
           <input
@@ -211,14 +220,14 @@ export default function CustomerForm({ customer }: CustomerFormProps) {
             maxLength={20}
             autoComplete="tel"
             className={inputClass}
-            placeholder="Mobile number"
+            placeholder={t.phonePlaceholder}
           />
         </label>
 
         <label className={labelClass}>
           <span className="flex items-center gap-2">
             <Mail size={15} className="text-muted-foreground" />
-            Email address
+            {t.emailAddress}
           </span>
 
           <input
@@ -229,14 +238,14 @@ export default function CustomerForm({ customer }: CustomerFormProps) {
             maxLength={254}
             autoComplete="email"
             className={inputClass}
-            placeholder="shop@example.com"
+            placeholder={t.emailPlaceholder}
           />
         </label>
 
         <label className={`${labelClass} sm:col-span-2`}>
           <span className="flex items-center gap-2">
             <MapPin size={15} className="text-muted-foreground" />
-            Shop address
+            {t.shopAddress}
           </span>
 
           <input
@@ -246,12 +255,12 @@ export default function CustomerForm({ customer }: CustomerFormProps) {
             maxLength={250}
             autoComplete="street-address"
             className={inputClass}
-            placeholder="Street, area, landmark"
+            placeholder={t.shopAddressPlaceholder}
           />
         </label>
 
         <label className={labelClass}>
-          City
+          {t.city}
           <input
             name="city"
             value={form.city}
@@ -259,12 +268,12 @@ export default function CustomerForm({ customer }: CustomerFormProps) {
             maxLength={100}
             autoComplete="address-level2"
             className={inputClass}
-            placeholder="City"
+            placeholder={t.cityPlaceholder}
           />
         </label>
 
         <label className={labelClass}>
-          State
+          {t.state}
           <input
             name="state"
             value={form.state}
@@ -272,12 +281,12 @@ export default function CustomerForm({ customer }: CustomerFormProps) {
             maxLength={100}
             autoComplete="address-level1"
             className={inputClass}
-            placeholder="State"
+            placeholder={t.statePlaceholder}
           />
         </label>
 
         <label className={labelClass}>
-          PIN code
+          {t.pinCode}
           <input
             name="pincode"
             value={form.pincode}
@@ -285,26 +294,26 @@ export default function CustomerForm({ customer }: CustomerFormProps) {
             maxLength={12}
             autoComplete="postal-code"
             className={inputClass}
-            placeholder="Postal code"
+            placeholder={t.postalCodePlaceholder}
           />
         </label>
 
         <label className={labelClass}>
-          GSTIN
+          {t.gstin}
           <input
             name="gstin"
             value={form.gstin}
             onChange={handleChange}
             maxLength={15}
             className={inputClass}
-            placeholder="Optional GSTIN"
+            placeholder={t.optionalGstinPlaceholder}
           />
         </label>
 
         <label className={`${labelClass} sm:col-span-2`}>
           <span className="flex items-center gap-2">
             <FileText size={15} className="text-muted-foreground" />
-            Notes
+            {t.notes}
           </span>
 
           <textarea
@@ -314,11 +323,11 @@ export default function CustomerForm({ customer }: CustomerFormProps) {
             rows={4}
             maxLength={1000}
             className={`${inputClass} resize-y`}
-            placeholder="Visit details or other notes..."
+            placeholder={t.notesPlaceholder}
           />
 
           <span className="text-xs font-normal text-muted-foreground">
-            {form.notes.length}/1000 characters
+            {form.notes.length}/1000 {t.characters}
           </span>
         </label>
       </div>
@@ -331,7 +340,7 @@ export default function CustomerForm({ customer }: CustomerFormProps) {
           className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border bg-background px-5 py-3 text-sm font-medium text-foreground transition hover:bg-muted"
         >
           <ArrowLeft size={16} />
-          Cancel
+          {t.cancel}
         </button>
 
         <button
@@ -339,7 +348,7 @@ export default function CustomerForm({ customer }: CustomerFormProps) {
           className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <Save size={17} />
-          {customer ? "Save changes" : "Save customer"}
+          {customer ? t.saveChanges : t.saveCustomer}
         </button>
       </div>
     </form>

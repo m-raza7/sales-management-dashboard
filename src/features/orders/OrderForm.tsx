@@ -16,12 +16,12 @@ import {
 
 import type { Customer } from "@/features/customers/types";
 import { getCustomers } from "@/features/customers/customer.service";
-
 import type { Product } from "@/features/products/types";
 import { getProducts } from "@/features/products/product.service";
-
 import { addOrder } from "./order.service";
 import type { OrderItem } from "./types";
+import { useLanguage } from "@/components/providers/LanguageProvider";
+import { translations } from "@/lib/i18n/translations";
 
 type DraftItem = {
   productId: string;
@@ -46,6 +46,8 @@ const cardClass =
 
 export default function OrderForm() {
   const router = useRouter();
+  const { language, mounted } = useLanguage();
+  const t = translations[language];
 
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -58,11 +60,15 @@ export default function OrderForm() {
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [notes, setNotes] = useState("");
   const [error, setError] = useState("");
+  const [dataReady, setDataReady] = useState(false);
 
   useEffect(() => {
+    if (!mounted) return;
+
     setCustomers(getCustomers());
     setProducts(getProducts().filter((product) => product.active));
-  }, []);
+    setDataReady(true);
+  }, [mounted]);
 
   const selectedCustomer = customers.find(
     (customer) => customer.id === customerId,
@@ -70,11 +76,9 @@ export default function OrderForm() {
 
   const preparedItems = items.map((item) => {
     const product = products.find((entry) => entry.id === item.productId);
-
     const quantity = Math.max(0, Number(item.quantity) || 0);
     const discount = Math.max(0, Number(item.discount) || 0);
     const unitPrice = product?.price ?? 0;
-
     const lineTotal = Math.max(0, quantity * unitPrice - discount);
 
     return {
@@ -98,7 +102,6 @@ export default function OrderForm() {
   );
 
   const safeOrderDiscount = Math.max(0, Number(orderDiscount) || 0);
-
   const total = Math.max(0, subtotal - itemDiscount - safeOrderDiscount);
 
   function updateItem(
@@ -147,7 +150,7 @@ export default function OrderForm() {
     setError("");
 
     if (!selectedCustomer) {
-      setError("Please select a customer.");
+      setError(t.orderSelectCustomerError);
       return;
     }
 
@@ -155,7 +158,7 @@ export default function OrderForm() {
       preparedItems.length === 0 ||
       preparedItems.some((item) => !item.product)
     ) {
-      setError("Select a product for every order row.");
+      setError(t.orderSelectProductError);
       return;
     }
 
@@ -167,7 +170,7 @@ export default function OrderForm() {
           !Number.isInteger(item.quantity),
       )
     ) {
-      setError("Every product quantity must be a positive whole number.");
+      setError(t.orderQuantityError);
       return;
     }
 
@@ -179,9 +182,7 @@ export default function OrderForm() {
           item.discount > item.quantity * item.unitPrice,
       )
     ) {
-      setError(
-        "Each item discount must be valid and cannot exceed its line amount.",
-      );
+      setError(t.orderItemDiscountError);
       return;
     }
 
@@ -192,7 +193,7 @@ export default function OrderForm() {
       orderDiscount < 0 ||
       orderDiscount > maximumOrderDiscount
     ) {
-      setError("Enter a valid order discount.");
+      setError(t.orderDiscountError);
       return;
     }
 
@@ -222,6 +223,12 @@ export default function OrderForm() {
     router.push("/orders");
   }
 
+  if (!mounted || !dataReady) {
+    return (
+      <div className="min-h-64 animate-pulse rounded-2xl border border-border bg-card" />
+    );
+  }
+
   if (customers.length === 0) {
     return (
       <div className="rounded-2xl border border-border bg-card p-6 text-card-foreground shadow-sm sm:p-8">
@@ -229,10 +236,12 @@ export default function OrderForm() {
           <Users size={24} />
         </div>
 
-        <h2 className="mt-4 text-lg font-semibold">Add a customer first</h2>
+        <h2 className="mt-4 text-lg font-semibold">
+          {t.orderAddCustomerFirst}
+        </h2>
 
         <p className="mt-2 text-sm leading-6 text-muted-foreground">
-          Create a shop record before placing an order.
+          {t.orderCustomerRequiredDescription}
         </p>
 
         <button
@@ -241,7 +250,7 @@ export default function OrderForm() {
           className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
         >
           <Plus size={17} />
-          Add customer
+          {t.orderAddCustomer}
         </button>
       </div>
     );
@@ -255,11 +264,11 @@ export default function OrderForm() {
         </div>
 
         <h2 className="mt-4 text-lg font-semibold">
-          Add an active product first
+          {t.orderAddActiveProductFirst}
         </h2>
 
         <p className="mt-2 text-sm leading-6 text-muted-foreground">
-          You need at least one active product to create an order.
+          {t.orderActiveProductRequiredDescription}
         </p>
 
         <button
@@ -268,7 +277,7 @@ export default function OrderForm() {
           className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
         >
           <Plus size={17} />
-          Add product
+          {t.orderAddProduct}
         </button>
       </div>
     );
@@ -293,22 +302,22 @@ export default function OrderForm() {
             <Users size={21} />
           </div>
           <div>
-            <h2 className="font-semibold">Customer details</h2>
+            <h2 className="font-semibold">{t.orderCustomerDetails}</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Select the shop receiving this order.
+              {t.orderSelectShopDescription}
             </p>
           </div>
         </div>
 
         <label className={labelClass}>
-          Select shop *
+          {t.orderSelectShop} *
           <select
             className={`${inputClass} dark:[color-scheme:dark]`}
             value={customerId}
             onChange={(event) => handleCustomerChange(event.target.value)}
             required
           >
-            <option value="">Choose a shop</option>
+            <option value="">{t.orderChooseShop}</option>
             {customers.map((customer) => (
               <option key={customer.id} value={customer.id}>
                 {customer.shopName} — {customer.ownerName}
@@ -321,7 +330,7 @@ export default function OrderForm() {
           <div className="grid gap-3 rounded-xl border border-border bg-muted/40 p-4 text-sm sm:grid-cols-2">
             <div>
               <p className="text-xs font-medium text-muted-foreground">
-                Shop owner
+                {t.orderShopOwner}
               </p>
               <p className="mt-1 font-medium text-foreground">
                 {selectedCustomer.ownerName}
@@ -330,7 +339,7 @@ export default function OrderForm() {
 
             <div>
               <p className="text-xs font-medium text-muted-foreground">
-                Phone number
+                {t.phone}
               </p>
               <p className="mt-1 font-medium text-foreground">
                 {selectedCustomer.phone}
@@ -348,9 +357,9 @@ export default function OrderForm() {
               <ShoppingCart size={21} />
             </div>
             <div>
-              <h2 className="font-semibold">Order items</h2>
+              <h2 className="font-semibold">{t.orderItems}</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Choose products, quantities and discounts.
+                {t.orderItemsDescription}
               </p>
             </div>
           </div>
@@ -361,7 +370,7 @@ export default function OrderForm() {
             className="inline-flex min-h-10 items-center justify-center gap-2 self-start rounded-xl border border-border bg-background px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-muted sm:self-auto"
           >
             <Plus size={16} />
-            Add product
+            {t.orderAddProduct}
           </button>
         </div>
 
@@ -375,7 +384,9 @@ export default function OrderForm() {
                 className="min-w-0 space-y-4 rounded-xl border border-border bg-background/50 p-4 sm:p-5"
               >
                 <div className="flex items-center justify-between gap-3">
-                  <h3 className="text-sm font-semibold">Item {index + 1}</h3>
+                  <h3 className="text-sm font-semibold">
+                    {t.orderItem} {index + 1}
+                  </h3>
 
                   {items.length > 1 && (
                     <button
@@ -384,13 +395,13 @@ export default function OrderForm() {
                       className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-500/10 dark:text-red-300"
                     >
                       <Trash2 size={14} />
-                      Remove
+                      {t.orderRemove}
                     </button>
                   )}
                 </div>
 
                 <label className={labelClass}>
-                  Product *
+                  {t.orderProduct} *
                   <select
                     className={`${inputClass} dark:[color-scheme:dark]`}
                     value={item.productId}
@@ -399,7 +410,7 @@ export default function OrderForm() {
                     }
                     required
                   >
-                    <option value="">Select product</option>
+                    <option value="">{t.orderSelectProduct}</option>
                     {products.map((product) => (
                       <option key={product.id} value={product.id}>
                         {product.name} — {money(product.price)}
@@ -410,7 +421,7 @@ export default function OrderForm() {
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                   <label className={labelClass}>
-                    Quantity
+                    {t.orderQuantity}
                     <input
                       className={inputClass}
                       type="number"
@@ -429,7 +440,7 @@ export default function OrderForm() {
                   </label>
 
                   <label className={labelClass}>
-                    Discount (₹)
+                    {t.orderItemDiscount} (₹)
                     <input
                       className={inputClass}
                       type="number"
@@ -447,7 +458,7 @@ export default function OrderForm() {
                   </label>
 
                   <div className="min-w-0 space-y-2 text-sm font-medium">
-                    <p>Line total</p>
+                    <p>{t.orderLineTotal}</p>
                     <div className="flex min-h-11 items-center rounded-xl border border-border bg-muted/50 px-3.5 py-3 font-semibold text-foreground">
                       <span className="break-words">
                         {money(row.lineTotal)}
@@ -461,7 +472,7 @@ export default function OrderForm() {
         </div>
       </section>
 
-      {/* Delivery, payment and summary */}
+      {/* Delivery and payment */}
       <div className="grid min-w-0 gap-6 lg:grid-cols-2 lg:items-start">
         <section className={cardClass}>
           <div className="flex items-center gap-3 border-b border-border pb-4">
@@ -469,50 +480,50 @@ export default function OrderForm() {
               <MapPin size={21} />
             </div>
             <div>
-              <h2 className="font-semibold">Delivery and payment</h2>
+              <h2 className="font-semibold">{t.orderDeliveryAndPayment}</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Add delivery instructions and payment details.
+                {t.orderDeliveryDescription}
               </p>
             </div>
           </div>
 
           <label className={labelClass}>
-            Delivery address
+            {t.orderDeliveryAddress}
             <textarea
               className={inputClass}
               rows={3}
               value={deliveryAddress}
               onChange={(event) => setDeliveryAddress(event.target.value)}
-              placeholder="Enter delivery address..."
+              placeholder={t.orderDeliveryAddressPlaceholder}
             />
           </label>
 
           <label className={labelClass}>
             <span className="flex items-center gap-2">
               <CreditCard size={16} className="text-muted-foreground" />
-              Payment method
+              {t.orderPaymentMethod}
             </span>
             <select
               className={`${inputClass} dark:[color-scheme:dark]`}
               value={paymentMethod}
               onChange={(event) => setPaymentMethod(event.target.value)}
             >
-              <option value="unpaid">Unpaid</option>
-              <option value="cash">Cash</option>
-              <option value="upi">UPI</option>
-              <option value="bank_transfer">Bank transfer</option>
-              <option value="credit">Credit</option>
+              <option value="unpaid">{t.orderUnpaid}</option>
+              <option value="cash">{t.orderCash}</option>
+              <option value="upi">{t.orderUpi}</option>
+              <option value="bank_transfer">{t.orderBankTransfer}</option>
+              <option value="credit">{t.orderCredit}</option>
             </select>
           </label>
 
           <label className={labelClass}>
-            Order notes
+            {t.orderNotes}
             <textarea
               className={inputClass}
               rows={3}
               value={notes}
               onChange={(event) => setNotes(event.target.value)}
-              placeholder="Special instructions..."
+              placeholder={t.orderNotesPlaceholder}
             />
           </label>
         </section>
@@ -524,28 +535,30 @@ export default function OrderForm() {
               <ShoppingCart size={21} />
             </div>
             <div>
-              <h2 className="font-semibold">Order summary</h2>
+              <h2 className="font-semibold">{t.orderSummary}</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Review the final amount before saving.
+                {t.orderSummaryDescription}
               </p>
             </div>
           </div>
 
           <div className="space-y-4">
             <div className="flex items-center justify-between gap-3 text-sm">
-              <span className="text-muted-foreground">Subtotal</span>
+              <span className="text-muted-foreground">{t.orderSubtotal}</span>
               <span className="font-medium">{money(subtotal)}</span>
             </div>
 
             <div className="flex items-center justify-between gap-3 text-sm">
-              <span className="text-muted-foreground">Item discounts</span>
+              <span className="text-muted-foreground">
+                {t.orderItemDiscounts}
+              </span>
               <span className="font-medium text-emerald-700 dark:text-emerald-300">
                 −{money(itemDiscount)}
               </span>
             </div>
 
             <label className={labelClass}>
-              Additional order discount (₹)
+              {t.orderAdditionalDiscount} (₹)
               <input
                 className={inputClass}
                 type="number"
@@ -559,7 +572,7 @@ export default function OrderForm() {
             </label>
 
             <div className="flex items-center justify-between gap-3 border-t border-border pt-4">
-              <span className="text-base font-semibold">Total</span>
+              <span className="text-base font-semibold">{t.orderTotal}</span>
               <span className="break-words text-xl font-bold tracking-tight text-primary sm:text-2xl">
                 {money(total)}
               </span>
@@ -572,7 +585,7 @@ export default function OrderForm() {
               className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <Save size={17} />
-              Save order
+              {t.orderSaveOrder}
             </button>
 
             <button
@@ -580,13 +593,12 @@ export default function OrderForm() {
               onClick={() => router.push("/orders")}
               className="min-h-11 w-full rounded-xl border border-border bg-card px-5 py-3 text-sm font-medium text-foreground transition hover:bg-muted"
             >
-              Cancel
+              {t.cancel}
             </button>
           </div>
 
           <p className="text-xs leading-5 text-muted-foreground">
-            Saving creates a pending order in this browser. Payment collection
-            and inventory updates are not automatic.
+            {t.orderStorageNotice}
           </p>
         </section>
       </div>

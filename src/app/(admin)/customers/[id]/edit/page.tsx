@@ -3,49 +3,90 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { ArrowLeft, Store, Sparkles } from "lucide-react";
+
 import CustomerForm from "@/features/customers/CustomerForm";
 import type { Customer } from "@/features/customers/types";
 import { getCustomers } from "@/features/customers/customer.service";
+import { useLanguage } from "@/components/providers/LanguageProvider";
+import { translations } from "@/lib/i18n/translations";
 
 export default function EditCustomerPage() {
   const params = useParams<{ id: string }>();
+  const { language, mounted } = useLanguage();
+  const t = translations[language];
+
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    if (!mounted) return;
+
     const found = getCustomers().find((item) => item.id === params.id);
+
     setCustomer(found ?? null);
     setReady(true);
-  }, [params.id]);
+  }, [params.id, mounted]);
 
-  if (!ready) {
-    return <p className="text-sm text-gray-500">Loading customer...</p>;
+  if (!mounted || !ready) {
+    return (
+      <section className="mx-auto max-w-3xl space-y-6">
+        <div className="h-8 w-48 animate-pulse rounded-lg bg-muted" />
+        <div className="h-64 animate-pulse rounded-2xl bg-muted" />
+      </section>
+    );
   }
 
   if (!customer) {
     return (
-      <div className="space-y-4">
-        <h1 className="text-2xl font-bold">Customer not found</h1>
-        <Link href="/customers" className="text-blue-600 hover:underline">
-          Back to customers
+      <section className="mx-auto max-w-3xl space-y-4 text-foreground">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+          <Store size={24} />
+        </div>
+
+        <h1 className="text-2xl font-bold tracking-tight">
+          {t.customerNotFound}
+        </h1>
+
+        <Link
+          href="/customers"
+          className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+        >
+          <ArrowLeft size={16} />
+          {t.backToCustomers}
         </Link>
-      </div>
+      </section>
     );
   }
 
   return (
-    <section className="mx-auto max-w-3xl space-y-6">
+    <section className="mx-auto w-full max-w-3xl space-y-6 text-foreground sm:space-y-8">
       <div>
         <Link
           href="/customers"
-          className="text-sm text-blue-600 hover:underline"
+          className="mb-4 inline-flex items-center gap-2 rounded-lg text-sm font-medium text-muted-foreground transition hover:text-foreground"
         >
-          ← Back to customers
+          <ArrowLeft size={16} />
+          {t.backToCustomers}
         </Link>
-        <h1 className="mt-3 text-2xl font-bold">Edit customer</h1>
+
+        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+          <Sparkles size={15} className="text-gold" />
+          {t.salesManagement}
+        </div>
+
+        <h1 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
+          {t.editCustomer}
+        </h1>
+
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+          {t.editCustomerDescription}
+        </p>
       </div>
 
-      <CustomerForm customer={customer} />
+      <div className="rounded-2xl border border-border bg-card p-4 text-card-foreground shadow-sm sm:p-6 lg:p-8">
+        <CustomerForm customer={customer} />
+      </div>
     </section>
   );
 }
