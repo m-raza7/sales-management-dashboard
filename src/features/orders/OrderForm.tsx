@@ -488,7 +488,8 @@ export default function OrderForm() {
           </div>
 
           <label className={labelClass}>
-            {t.orderDeliveryAddress}
+            {/* {t.orderDeliveryAddress} */}
+            {t.deliveryAddress}
             <textarea
               className={inputClass}
               rows={3}

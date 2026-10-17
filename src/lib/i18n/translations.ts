@@ -4,6 +4,16 @@ export const translations = {
   en: {
     // App and navigation*
 
+    saveCustomer: "Save Customer",
+
+    orderQuantity: "Quantity",
+
+    orderDeliveryAddress: "Delivery Address",
+
+    orderCash: "Cash",
+
+    orderUpi: "UPI",
+
     appBrand: "Emerald Sales",
 
     workspace: "SALES WORKSPACE",
@@ -629,6 +639,16 @@ export const translations = {
 
   mr: {
     // App and navigation*
+
+    saveCustomer: "ग्राहक जतन करा",
+
+    orderQuantity: "प्रमाण",
+
+    orderDeliveryAddress: "वितरणाचा पत्ता",
+
+    orderCash: "रोख",
+
+    orderUpi: "यूपीआय",
 
     appBrand: "एमराल्ड सेल्स",
 
@@ -1257,6 +1277,16 @@ export const translations = {
 
   hi: {
     // App and navigation*
+
+    saveCustomer: "ग्राहक सेव करें",
+
+    orderQuantity: "मात्रा",
+
+    orderDeliveryAddress: "डिलीवरी का पता",
+
+    orderCash: "नकद",
+
+    orderUpi: "यूपीआई",
 
     appBrand: "एमराल्ड सेल्स",
 
