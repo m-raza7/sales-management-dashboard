@@ -57,8 +57,8 @@ export default function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
             className="flex min-w-0 items-center gap-3 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-[#D8B66A]"
           >
             <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#D8B66A] text-[#073B32] shadow-sm">
-              {/* <Leaf size={21} strokeWidth={2.2} /> */}
-              <Orbit size={23} strokeWidth={2} />
+              <Leaf size={21} strokeWidth={2.2} />
+              {/* <Orbit size={23} strokeWidth={2} /> */}
             </span>
 
             <span className="min-w-0">
