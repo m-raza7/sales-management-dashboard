@@ -27,7 +27,7 @@ export default function NewCustomerPage() {
         <div className="min-w-0">
           <Link
             href="/customers"
-            className="mb-4 inline-flex items-center gap-2 rounded-lg text-sm font-medium text-muted-foreground transition hover:text-foreground"
+            className="mb-4 hidden items-center gap-2 rounded-lg text-sm font-medium text-muted-foreground transition hover:text-foreground sm:inline-flex"
           >
             <ArrowLeft size={16} />
             {t.backToCustomers}
@@ -47,7 +47,7 @@ export default function NewCustomerPage() {
           </p>
         </div>
 
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center self-start rounded-2xl border border-border bg-primary/10 text-primary sm:h-14 sm:w-14">
+        <div className="hidden h-12 w-12 shrink-0 items-center justify-center self-start rounded-2xl border border-border bg-primary/10 text-primary lg:flex lg:h-14 lg:w-14">
           <Store size={25} />
         </div>
       </div>
