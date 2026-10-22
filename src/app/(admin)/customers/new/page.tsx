@@ -21,7 +21,7 @@ export default function NewCustomerPage() {
   }
 
   return (
-    <section className="mx-auto w-full max-w-4xl space-y-6 text-foreground sm:space-y-8">
+    <section className="mx-auto w-full space-y-6 text-foreground sm:space-y-8">
       {/* Page heading */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
         <div className="min-w-0">
