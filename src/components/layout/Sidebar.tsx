@@ -66,7 +66,7 @@ export default function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
                 {t("brand")}
               </span>
               <span className="mt-0.5 block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D8B66A]">
-                Management
+                {t("brandSubtitle")}
               </span>
             </span>
           </Link>
@@ -137,7 +137,7 @@ export default function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
           </Link>
 
           <p className="mt-4 text-center text-[9px] font-medium uppercase tracking-wide text-white/40">
-            Sales Workspace · Local Edition
+            {t("footerBrandLine")}
           </p>
         </div>
       </aside>

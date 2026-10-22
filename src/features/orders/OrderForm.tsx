@@ -310,7 +310,7 @@ export default function OrderForm() {
         </div>
 
         <label className={labelClass}>
-          {t.orderSelectShop} *
+          {t.orderSelectShop} <span className="text-[var(--danger)]">*</span>
           <select
             className={`${inputClass} dark:[color-scheme:dark]`}
             value={customerId}
@@ -401,7 +401,8 @@ export default function OrderForm() {
                 </div>
 
                 <label className={labelClass}>
-                  {t.orderProduct} *
+                  {t.orderProduct}{" "}
+                  <span className="text-[var(--danger)]">*</span>
                   <select
                     className={`${inputClass} dark:[color-scheme:dark]`}
                     value={item.productId}

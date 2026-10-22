@@ -4,6 +4,12 @@ export const translations = {
   en: {
     // App and navigation*
 
+    brandSubtitle: "Management",
+
+    footerBrandLine: "Sales Workspace · Local Edition",
+
+    footerTagline: "Made for better business.",
+
     saveCustomer: "Save Customer",
 
     orderQuantity: "Quantity",
@@ -639,6 +645,12 @@ export const translations = {
 
   mr: {
     // App and navigation*
+
+    brandSubtitle: "व्यवस्थापन",
+
+    footerBrandLine: "विक्री व्यवस्थापन · स्थानिक आवृत्ती",
+
+    footerTagline: "व्यवसायाच्या प्रगतीसाठी बनवलेले.",
 
     saveCustomer: "ग्राहक जतन करा",
 
@@ -1277,6 +1289,12 @@ export const translations = {
 
   hi: {
     // App and navigation*
+
+    brandSubtitle: "प्रबंधन",
+
+    footerBrandLine: "सेल्स वर्कस्पेस · स्थानीय संस्करण",
+
+    footerTagline: "बेहतर व्यापार के लिए बनाया गया।",
 
     saveCustomer: "ग्राहक सेव करें",
 

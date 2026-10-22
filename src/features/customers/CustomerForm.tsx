@@ -172,7 +172,8 @@ export default function CustomerForm({ customer }: CustomerFormProps) {
         <label className={labelClass}>
           <span className="flex items-center gap-2">
             <Store size={15} className="text-muted-foreground" />
-            {t.shopName} *
+            {t.shopName}
+            <span className="text-[var(--danger)]">*</span>
           </span>
 
           <input
@@ -190,7 +191,8 @@ export default function CustomerForm({ customer }: CustomerFormProps) {
         <label className={labelClass}>
           <span className="flex items-center gap-2">
             <UserRound size={15} className="text-muted-foreground" />
-            {t.ownerName} *
+            {t.ownerName}
+            <span className="text-[var(--danger)]">*</span>
           </span>
 
           <input
@@ -208,7 +210,8 @@ export default function CustomerForm({ customer }: CustomerFormProps) {
         <label className={labelClass}>
           <span className="flex items-center gap-2">
             <Phone size={15} className="text-muted-foreground" />
-            {t.phone} *
+            {t.phone}
+            <span className="text-[var(--danger)]">*</span>
           </span>
 
           <input

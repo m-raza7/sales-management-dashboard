@@ -4,6 +4,12 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

@@ -342,8 +342,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
           {children}
 
           <footer className="mt-10 border-t border-border py-5 text-center text-xs text-muted-foreground">
-            © {new Date().getFullYear()} {t("brand")} · Made for better
-            business.
+            © {new Date().getFullYear()} {t("brand")} · {t("footerTagline")}
           </footer>
         </main>
       </div>
