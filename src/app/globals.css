@@ -10,6 +10,61 @@ input[type="search"]::-webkit-search-cancel-button {
   display: none;
 }
 
+/* Nexora animated emerald-gold text shine */
+.nexora-shine {
+  display: inline-block;
+  color: transparent;
+  background-image: linear-gradient(
+    110deg,
+    #047857 0%,
+    #10b981 20%,
+    #d8b66a 35%,
+    #fff1b8 42%,
+    #d8b66a 50%,
+    #10b981 65%,
+    #047857 80%,
+    #d8b66a 100%
+  );
+  background-size: 250% 100%;
+  background-position: 100% 50%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: nexora-shine 4s linear infinite;
+}
+
+.dark .nexora-shine {
+  background-image: linear-gradient(
+    110deg,
+    #34d399 0%,
+    #059669 20%,
+    #d8b66a 35%,
+    #fff4c2 42%,
+    #d8b66a 50%,
+    #5eead4 65%,
+    #34d399 80%,
+    #d8b66a 100%
+  );
+}
+
+@keyframes nexora-shine {
+  from {
+    background-position: 100% 50%;
+  }
+
+  to {
+    background-position: -150% 50%;
+  }
+}
+
+/* Respect reduced-motion accessibility settings */
+@media (prefers-reduced-motion: reduce) {
+  .nexora-shine {
+    animation: none;
+    background-position: 50% 50%;
+  }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

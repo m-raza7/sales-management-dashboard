@@ -22,6 +22,7 @@ import {
   Settings2,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 import Sidebar from "./Sidebar";
 import ThemeToggle from "@/components/common/ThemeToggle";
@@ -307,30 +308,53 @@ export default function AdminShell({ children }: { children: ReactNode }) {
 
       <div className="min-h-screen min-w-0 lg:pl-[272px]">
         <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-xl">
-          <div className="flex h-[68px] min-w-0 items-center gap-3 px-3 sm:px-5 lg:px-6">
-            {/* Mobile navigation */}
+          <div className="flex h-14 w-full min-w-0 items-center gap-2 px-2.5 min-[400px]:gap-2.5 min-[400px]:px-3 sm:h-[68px] sm:gap-3 sm:px-5 lg:px-6">
+            {/* Mobile and tablet menu */}
             <button
               type="button"
               onClick={() => setMobileOpen((previous) => !previous)}
               aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
               aria-expanded={mobileOpen}
-              className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-foreground transition-colors hover:bg-muted lg:hidden"
+              aria-controls="app-sidebar"
+              className="flex size-9 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-muted sm:size-10 lg:hidden"
             >
-              {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+              {mobileOpen ? <X size={19} /> : <Menu size={19} />}
             </button>
 
-            {/* Page title — no duplicate logo */}
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-bold tracking-tight text-foreground sm:text-base">
-                Sales Workspace
-              </p>
-              <p className="hidden truncate text-xs text-muted-foreground sm:block">
-                Manage your business
-              </p>
-            </div>
+            {/* Responsive Nexora branding */}
 
-            {/* Language dropdown and theme toggle */}
-            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+            <Link
+              href="/dashboard"
+              aria-label="Nexora Sales Management home"
+              className="flex min-w-0 flex-1 items-center gap-2 sm:flex-none sm:gap-2.5 lg:w-[220px]"
+            >
+              {/* Logo: hidden on narrow mobile screens */}
+              <div className="relative hidden size-8 shrink-0 min-[400px]:block sm:size-10">
+                <Image
+                  src="/images/Glossy Emerald and Gold Ribbon N Logo.png"
+                  alt=""
+                  fill
+                  priority
+                  sizes="40px"
+                  className="rounded-lg object-contain"
+                />
+              </div>
+
+              {/* Brand text */}
+              <div className="min-w-0 leading-tight max-[400px]:mt-[6px]">
+                <p className="nexora-shine truncate text-base font-extrabold tracking-[0.06em] min-[376px]:text-sm min-[376px]:tracking-[0.08em] sm:text-base sm:tracking-[0.12em]">
+                  NEXORA
+                </p>
+
+                {/* Subtitle: hidden on narrow mobile screens */}
+                <p className="hidden truncate text-[9px] font-semibold uppercase tracking-[0.16em] text-muted-foreground min-[400px]:block">
+                  Sales Management
+                </p>
+              </div>
+            </Link>
+
+            {/* Language and theme controls */}
+            <div className="ml-auto flex shrink-0 items-center gap-1 min-[400px]:gap-1.5 sm:gap-2">
               <LanguageSwitcher />
               <ThemeToggle />
             </div>

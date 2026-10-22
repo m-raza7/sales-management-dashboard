@@ -4,7 +4,7 @@ export const translations = {
   en: {
     // App and navigation*
 
-    brandSubtitle: "Management",
+    brandSubtitle: "Sales Management",
 
     footerBrandLine: "Sales Workspace · Local Edition",
 
@@ -646,7 +646,7 @@ export const translations = {
   mr: {
     // App and navigation*
 
-    brandSubtitle: "व्यवस्थापन",
+    brandSubtitle: "विक्री व्यवस्थापन",
 
     footerBrandLine: "विक्री व्यवस्थापन · स्थानिक आवृत्ती",
 
@@ -1290,7 +1290,7 @@ export const translations = {
   hi: {
     // App and navigation*
 
-    brandSubtitle: "प्रबंधन",
+    brandSubtitle: "सेल्स प्रबंधन",
 
     footerBrandLine: "सेल्स वर्कस्पेस · स्थानीय संस्करण",
 

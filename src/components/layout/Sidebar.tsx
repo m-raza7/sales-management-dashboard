@@ -13,6 +13,7 @@ import {
   X,
 } from "lucide-react";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import Image from "next/image";
 
 const links = [
   { href: "/dashboard", key: "dashboard" as const, icon: LayoutDashboard },
@@ -56,14 +57,21 @@ export default function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
             onClick={onClose}
             className="flex min-w-0 items-center gap-3 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-[#D8B66A]"
           >
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#D8B66A] text-[#073B32] shadow-sm">
-              <Leaf size={21} strokeWidth={2.2} />
-              {/* <Orbit size={23} strokeWidth={2} /> */}
+            <span className="relative flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#cca757]/60 bg-[#fff] p-1 shadow-md shadow-black/15">
+              <Image
+                src="/images/Glossy Emerald and Gold Ribbon N Logo.png"
+                alt="Nexora"
+                fill
+                priority
+                sizes="40px"
+                className="object-contain p-1"
+              />
             </span>
 
             <span className="min-w-0">
               <span className="block truncate text-base font-bold tracking-tight">
-                {t("brand")}
+                {/* {t("brand")} */}
+                Nexora
               </span>
               <span className="mt-0.5 block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D8B66A]">
                 {t("brandSubtitle")}
