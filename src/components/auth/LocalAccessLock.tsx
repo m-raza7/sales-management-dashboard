@@ -3,9 +3,11 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { LockKeyhole, ShieldCheck, Eye, EyeOff } from "lucide-react";
 
-const ACCESS_CODE = "MR2026@123"; // Change your code here
-const STORAGE_KEY = "sales-management-access";
-const ACCESS_DURATION = 24 * 60 * 60 * 1000;
+import {
+  NEXT_PUBLIC_ACCESS_CODE,
+  NEXT_PUBLIC_STORAGE_KEY,
+  NEXT_PUBLIC_ACCESS_DURATION,
+} from "@/lib/access-config";
 
 type AccessSession = {
   verified: boolean;
@@ -28,7 +30,7 @@ export default function LocalAccessLock({
     setMounted(true);
 
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved = localStorage.getItem(NEXT_PUBLIC_STORAGE_KEY);
 
       if (saved) {
         const session = JSON.parse(saved) as AccessSession;
@@ -40,11 +42,11 @@ export default function LocalAccessLock({
         ) {
           setVerified(true);
         } else {
-          localStorage.removeItem(STORAGE_KEY);
+          localStorage.removeItem(NEXT_PUBLIC_STORAGE_KEY);
         }
       }
     } catch {
-      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(NEXT_PUBLIC_STORAGE_KEY);
     }
   }, []);
 
@@ -53,7 +55,7 @@ export default function LocalAccessLock({
     setError("");
     setLoading(true);
 
-    if (code.trim() !== ACCESS_CODE) {
+    if (code.trim() !== NEXT_PUBLIC_ACCESS_CODE) {
       setError("Incorrect verification code. Please try again.");
       setLoading(false);
       return;
@@ -61,11 +63,11 @@ export default function LocalAccessLock({
 
     const session: AccessSession = {
       verified: true,
-      expiresAt: Date.now() + ACCESS_DURATION,
+      expiresAt: Date.now() + NEXT_PUBLIC_ACCESS_DURATION,
     };
 
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+      localStorage.setItem(NEXT_PUBLIC_STORAGE_KEY, JSON.stringify(session));
       setVerified(true);
       setCode("");
     } catch {
