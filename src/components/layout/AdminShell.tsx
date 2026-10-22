@@ -341,15 +341,14 @@ export default function AdminShell({ children }: { children: ReactNode }) {
               </div>
 
               {/* Brand text */}
-              <div className="min-w-0 leading-tight max-[400px]:mt-[6px]">
-                <p className="nexora-shine truncate text-base font-extrabold tracking-[0.06em] min-[376px]:text-sm min-[376px]:tracking-[0.08em] sm:text-base sm:tracking-[0.12em]">
+              <div className="min-w-0 leading-none max-[400px]:mt-[6px]">
+                <span className="nexora-shine block truncate text-base font-extrabold leading-none tracking-[0.06em] min-[376px]:text-sm min-[376px]:tracking-[0.08em] sm:text-xl sm:tracking-[0.12em]">
                   NEXORA
-                </p>
+                </span>
 
-                {/* Subtitle: hidden on narrow mobile screens */}
-                <p className="hidden truncate text-[9px] font-semibold uppercase tracking-[0.16em] text-muted-foreground min-[400px]:block">
+                <span className="mt-0 hidden truncate text-[9px] font-semibold uppercase leading-none tracking-[0.16em] text-muted-foreground min-[400px]:block">
                   Sales Management
-                </p>
+                </span>
               </div>
             </Link>
 
