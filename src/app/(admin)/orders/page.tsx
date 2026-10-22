@@ -34,7 +34,7 @@ const money = (value: number) =>
 
 const statusStyles: Record<OrderStatus, string> = {
   pending:
-    "bg-amber-500/10 text-amber-700 dark:text-amber-300 ring-amber-500/20",
+    "bg-yellow-500/10 text-yellow-700 dark:text-yellow-300 ring-yellow-500/25",
   confirmed: "bg-blue-500/10 text-blue-700 dark:text-blue-300 ring-blue-500/20",
   dispatched:
     "bg-violet-500/10 text-violet-700 dark:text-violet-300 ring-violet-500/20",

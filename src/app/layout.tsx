@@ -5,7 +5,8 @@ import CapacitorBackButton from "@/components/CapacitorBackButton";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Emerald Sales | Sales Management",
+  title:
+    "Nexora | Sales & Business Management | Professional, all-round business platform",
   description: "Manage customers, products and orders from one workspace.",
 };
 

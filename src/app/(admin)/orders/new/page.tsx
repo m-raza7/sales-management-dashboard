@@ -16,13 +16,13 @@ export default function NewOrderPage() {
         {/* Page heading */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
-            <Link
+            {/* <Link
               href="/orders"
               className="mb-4 hidden items-center gap-2 rounded-lg text-sm font-medium text-muted-foreground transition hover:text-foreground lg:inline-flex"
             >
               <ArrowLeft size={16} />
               {t.backToOrders}
-            </Link>
+            </Link> */}
 
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
               <Sparkles size={15} className="text-gold" />

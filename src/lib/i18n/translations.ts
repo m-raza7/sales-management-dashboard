@@ -4,6 +4,142 @@ export const translations = {
   en: {
     // App and navigation*
 
+    footer: {
+      tagline: "Smarter Sales. Stronger Business.",
+      description:
+        "Simplifying sales, organizing business operations, and helping you manage every order with confidence.",
+      explore: "Explore",
+      dashboard: "Dashboard",
+      customers: "Customers",
+      products: "Products",
+      orders: "Orders",
+      legalSecurity: "Legal & Security",
+      privacyPolicy: "Privacy Policy",
+      terms: "Terms & Conditions",
+      copyright: "Copyright",
+      security: "Security Policy",
+      allPolicies: "All policies",
+      connect: "Connect With Us",
+      contactText:
+        "Have a question or a request to reuse our original work? Contact the application owner.",
+      followUs: "Follow us",
+      copyrightNotice: "All rights reserved.",
+    },
+
+    terms: {
+      title: "Terms & Conditions",
+      description: "Rules governing authorized access to and use of NEXORA.",
+      acceptance: "Acceptance of Terms",
+      acceptanceText:
+        "By accessing or using NEXORA, you agree to comply with these terms and all applicable laws. If you do not agree, discontinue use of the application.",
+      authorizedUse: "Authorized Use",
+      lawfulUse:
+        "Use the application only for lawful and authorized business purposes.",
+      accurateRecords: "Provide accurate business and customer records.",
+      credentials: "Keep access credentials confidential.",
+      securityControls:
+        "Do not attempt to bypass access controls or compromise security.",
+      intellectualProperty: "Intellectual Property",
+      intellectualPropertyText:
+        "Unless otherwise stated, the original NEXORA source code, interface design, branding, logos, graphics, and documentation are owned by or licensed to the relevant rights holder and are protected by applicable intellectual property laws.",
+      intellectualPropertyText2:
+        "You may not copy, republish, redistribute, sell, sublicense, or create derivative works from protected materials without prior written permission, except where applicable law permits.",
+      dataResponsibility: "Data and Account Responsibility",
+      dataResponsibilityText:
+        "You are responsible for ensuring that information entered into the application is accurate and that you have the necessary authorization to store and process it.",
+      backupText:
+        "Maintain appropriate backups. Do not assume that information stored in a browser or on a device is automatically backed up.",
+      prohibitedActivities: "Prohibited Activities",
+      unauthorizedCopying:
+        "Unauthorized copying, distribution, or commercial reuse of protected materials.",
+      reverseEngineering:
+        "Reverse engineering or security testing without authorization, except where legally permitted.",
+      unauthorizedAccess:
+        "Unauthorized access to another person's records or account.",
+      unlawfulActivities:
+        "Using the application for unlawful, fraudulent, or harmful activities.",
+      availability: "Availability and Limitations",
+      availabilityText:
+        "Features may change, and uninterrupted availability cannot be guaranteed. To the extent permitted by law, the application is provided subject to its documented functionality and applicable warranties or consumer protections.",
+      termination: "Suspension and Termination",
+      terminationText:
+        "Access may be suspended or terminated for unauthorized use, security risks, or other lawful reasons, subject to applicable agreements and law.",
+      changesContact: "Changes and Contact",
+      changesContactText:
+        "These terms may be updated when the application or its requirements change. Material changes should be communicated where appropriate. Contact the application owner with questions about these terms or permission to reuse protected materials.",
+    },
+
+    security: {
+      title: "Security & Access Policy",
+      description:
+        "Guidelines for protecting NEXORA access and business information.",
+      authorizedAccess: "Authorized Access",
+      authorizedAccessText:
+        "Access should be limited to authorized users. Never share access codes or credentials with unauthorized people.",
+      protectDevice: "Protect Your Device",
+      devicePassword:
+        "Use a strong device password and keep your browser updated.",
+      lockDevice: "Lock your device when unattended.",
+      avoidSharedDevices:
+        "Avoid using the application on untrusted or shared devices.",
+      backups: "Keep reliable backups of important business records.",
+      reporting: "Reporting Security Issues",
+      reportingText:
+        "Report suspected unauthorized access, exposed credentials, or unexpected data changes promptly to the application owner. Do not access or disclose another user's information to investigate a suspected issue.",
+      limitations: "Security Limitations",
+      limitationsText:
+        "A browser-based access screen alone does not provide server-enforced authentication or protect data from someone who can inspect or modify the browser. Appropriate server-side access controls are required for sensitive business data.",
+    },
+
+    privacyPolicy: {
+      title: "Privacy Policy",
+      description: "How NEXORA handles business information and personal data.",
+      introduction: "Introduction",
+      introductionText:
+        "NEXORA provides sales and business management features for managing customers, products, orders, and related records. This policy explains how information is handled when you use the application.",
+      information: "Information We Handle",
+      informationText:
+        "Depending on how the application is configured, information may include:",
+      customerData: "Customer names, phone numbers, and delivery addresses.",
+      productData:
+        "Product details, prices, quantities, and inventory records.",
+      orderData: "Order details, payment methods, and transaction records.",
+      applicationData: "Application settings and access-related information.",
+      usage: "How Information Is Used",
+      usageText:
+        "Information is used to manage business operations, maintain customer and order records, generate reports, and support application functionality.",
+      security: "Storage and Security",
+      securityText:
+        "The actual storage location and security measures depend on the application's deployment and configuration. Reasonable technical and organizational safeguards should be maintained to protect information against unauthorized access, loss, alteration, or disclosure.",
+      sharing: "Sharing and Disclosure",
+      sharingText:
+        "Do not share personal or business information except where authorized, necessary to operate the service, required by law, or otherwise permitted under applicable law.",
+      retention: "Retention and Deletion",
+      retentionText:
+        "Records should be retained only as long as reasonably necessary for business, legal, and operational purposes. Deletion requests should be reviewed against applicable retention requirements and backup practices.",
+      contact: "Contact",
+      contactText:
+        "For privacy questions or requests, contact the application owner through the official contact details provided with your NEXORA deployment.",
+    },
+
+    copyright: {
+      title: "Copyright & Intellectual Property",
+      description:
+        "Protecting the original work, brand identity, and materials behind NEXORA.",
+      ownership: "Ownership",
+      ownershipText:
+        "Original software code, visual designs, logos, brand assets, and documentation are owned by or licensed to their respective rights holders. Customer and business data remain subject to the rights and obligations applicable to that data.",
+      restrictions: "Restrictions on Reuse",
+      restrictionsText:
+        "Unless you have written permission or applicable law provides otherwise, you may not reproduce, publish, redistribute, resell, sublicense, or commercially reuse protected NEXORA materials.",
+      permission: "Requesting Permission",
+      permissionText:
+        "Requests to reuse source code, branding, graphics, or other protected materials should be submitted to the application owner with details about the material and intended use.",
+      infringement: "Reporting Infringement",
+      infringementText:
+        "If you believe that protected NEXORA material has been used without authorization, provide the relevant details and supporting evidence through the official contact channel.",
+    },
+
     brandSubtitle: "Sales Management",
 
     footerBrandLine: "Sales Workspace · Local Edition",
@@ -645,6 +781,140 @@ export const translations = {
 
   mr: {
     // App and navigation*
+
+    footer: {
+      tagline: "स्मार्ट विक्री. मजबूत व्यवसाय.",
+      description:
+        "विक्री सुलभ करा, व्यवसायाचे कामकाज व्यवस्थित ठेवा आणि प्रत्येक ऑर्डर आत्मविश्वासाने व्यवस्थापित करा.",
+      explore: "अन्वेषण",
+      dashboard: "डॅशबोर्ड",
+      customers: "ग्राहक",
+      products: "उत्पादने",
+      orders: "ऑर्डर्स",
+      legalSecurity: "कायदेशीर माहिती आणि सुरक्षा",
+      privacyPolicy: "गोपनीयता धोरण",
+      terms: "अटी आणि शर्ती",
+      copyright: "कॉपीराइट",
+      security: "सुरक्षा धोरण",
+      allPolicies: "सर्व धोरणे",
+      connect: "आमच्याशी संपर्क साधा",
+      contactText:
+        "काही प्रश्न आहेत किंवा आमच्या मूळ कामाचा पुनर्वापर करायचा आहे? ॲपच्या मालकाशी संपर्क साधा.",
+      followUs: "आम्हाला फॉलो करा",
+      copyrightNotice: "सर्व हक्क राखीव.",
+    },
+
+    terms: {
+      title: "अटी आणि शर्ती",
+      description: "NEXORA मध्ये अधिकृत प्रवेश आणि वापरासाठीचे नियम.",
+      acceptance: "अटींची स्वीकृती",
+      acceptanceText:
+        "NEXORA मध्ये प्रवेश करून किंवा त्याचा वापर करून, आपण या अटी आणि लागू कायद्यांचे पालन करण्यास सहमत आहात. आपण सहमत नसल्यास ॲपचा वापर थांबवा.",
+      authorizedUse: "अधिकृत वापर",
+      lawfulUse:
+        "ॲपचा वापर फक्त कायदेशीर आणि अधिकृत व्यावसायिक कारणांसाठी करा.",
+      accurateRecords: "व्यवसाय आणि ग्राहकांच्या अचूक नोंदी द्या.",
+      credentials: "प्रवेशाशी संबंधित गोपनीय माहिती सुरक्षित ठेवा.",
+      securityControls:
+        "प्रवेश नियंत्रण चुकवण्याचा किंवा सुरक्षेला धोका निर्माण करण्याचा प्रयत्न करू नका.",
+      intellectualProperty: "बौद्धिक संपदा",
+      intellectualPropertyText:
+        "अन्यथा नमूद केले नसल्यास, NEXORA चा मूळ स्रोत कोड, इंटरफेस डिझाइन, ब्रँडिंग, लोगो, ग्राफिक्स आणि दस्तऐवज संबंधित हक्कधारकांच्या मालकीचे आहेत किंवा त्यांच्या परवान्याअंतर्गत वापरले जातात. त्यांना लागू बौद्धिक संपदा कायद्यांनुसार संरक्षण मिळते.",
+      intellectualPropertyText2:
+        "लागू कायद्यानुसार परवानगी असलेल्या बाबी वगळता, पूर्व लेखी परवानगीशिवाय संरक्षित सामग्रीची प्रत तयार करणे, पुनर्प्रकाशित करणे, पुनर्वितरित करणे, विक्री करणे, उपपरवाना देणे किंवा त्यावर आधारित नवीन काम तयार करणे अनुमत नाही.",
+      dataResponsibility: "डेटा आणि खात्याची जबाबदारी",
+      dataResponsibilityText:
+        "ॲपमध्ये भरलेली माहिती अचूक असल्याची आणि ती साठवण्यासाठी व प्रक्रिया करण्यासाठी आवश्यक परवानगी आपल्याकडे असल्याची खात्री करणे ही आपली जबाबदारी आहे.",
+      backupText:
+        "योग्य बॅकअप ठेवा. ब्राउझरमध्ये किंवा डिव्हाइसवर साठवलेल्या माहितीचा आपोआप बॅकअप घेतला जातो असे समजू नका.",
+      prohibitedActivities: "प्रतिबंधित क्रिया",
+      unauthorizedCopying:
+        "संरक्षित सामग्रीची अनधिकृत प्रत तयार करणे, वितरण करणे किंवा व्यावसायिक पुनर्वापर करणे.",
+      reverseEngineering:
+        "कायदेशीर परवानगी असलेल्या बाबी वगळता, अधिकृत परवानगीशिवाय रिव्हर्स इंजिनिअरिंग किंवा सुरक्षा चाचणी करणे.",
+      unauthorizedAccess:
+        "इतर व्यक्तीच्या नोंदी किंवा खात्यात अनधिकृत प्रवेश करणे.",
+      unlawfulActivities:
+        "ॲपचा वापर बेकायदेशीर, फसवणुकीच्या किंवा हानिकारक कृतींसाठी करणे.",
+      availability: "उपलब्धता आणि मर्यादा",
+      availabilityText:
+        "ॲपची वैशिष्ट्ये बदलू शकतात आणि अखंड उपलब्धतेची हमी देता येत नाही. लागू कायद्याने परवानगी दिलेल्या मर्यादेत, ॲप त्याच्या दस्तऐवजीकृत कार्यक्षमतेनुसार आणि लागू हमी किंवा ग्राहक संरक्षणाच्या अधीन राहून उपलब्ध केले जाते.",
+      termination: "प्रवेश निलंबित करणे आणि समाप्त करणे",
+      terminationText:
+        "लागू करार आणि कायद्याच्या अधीन राहून, अनधिकृत वापर, सुरक्षा धोके किंवा इतर कायदेशीर कारणांमुळे प्रवेश निलंबित किंवा समाप्त केला जाऊ शकतो.",
+      changesContact: "बदल आणि संपर्क",
+      changesContactText:
+        "ॲप किंवा त्याच्या आवश्यकतांमध्ये बदल झाल्यास या अटी अद्ययावत केल्या जाऊ शकतात. महत्त्वाचे बदल आवश्यकतेनुसार कळवले जावेत. या अटींबद्दल किंवा संरक्षित सामग्रीच्या पुनर्वापराच्या परवानगीबद्दल प्रश्न असल्यास ॲपच्या मालकाशी संपर्क साधा.",
+    },
+
+    security: {
+      title: "सुरक्षा आणि प्रवेश धोरण",
+      description:
+        "NEXORA चा प्रवेश आणि व्यवसायाची माहिती सुरक्षित ठेवण्यासाठी मार्गदर्शक तत्त्वे.",
+      authorizedAccess: "अधिकृत प्रवेश",
+      authorizedAccessText:
+        "प्रवेश फक्त अधिकृत वापरकर्त्यांपुरता मर्यादित असावा. प्रवेश कोड किंवा लॉगिन माहिती अनधिकृत व्यक्तींशी कधीही शेअर करू नका.",
+      protectDevice: "आपले डिव्हाइस सुरक्षित ठेवा",
+      devicePassword:
+        "डिव्हाइससाठी मजबूत पासवर्ड वापरा आणि ब्राउझर अद्ययावत ठेवा.",
+      lockDevice: "डिव्हाइस वापरात नसताना ते लॉक करा.",
+      avoidSharedDevices: "अविश्वसनीय किंवा सामायिक डिव्हाइसवर ॲप वापरणे टाळा.",
+      backups:
+        "महत्त्वाच्या व्यावसायिक नोंदींचा नियमित आणि विश्वसनीय बॅकअप ठेवा.",
+      reporting: "सुरक्षा समस्यांची तक्रार",
+      reportingText:
+        "अनधिकृत प्रवेश, उघड झालेली लॉगिन माहिती किंवा डेटामध्ये अनपेक्षित बदल आढळल्यास ॲपच्या मालकाला त्वरित कळवा. संशयित समस्येची चौकशी करण्यासाठी इतर वापरकर्त्यांची माहिती पाहू किंवा उघड करू नका.",
+      limitations: "सुरक्षेच्या मर्यादा",
+      limitationsText:
+        "केवळ ब्राउझरमध्ये दिसणारी प्रवेश स्क्रीन सर्व्हरद्वारे नियंत्रित प्रमाणीकरण देत नाही किंवा ब्राउझर तपासू अथवा बदलू शकणाऱ्या व्यक्तीपासून डेटाचे संरक्षण करत नाही. संवेदनशील व्यावसायिक डेटासाठी योग्य सर्व्हर-साइड प्रवेश नियंत्रण आवश्यक आहे.",
+    },
+
+    privacyPolicy: {
+      title: "गोपनीयता धोरण",
+      description: "NEXORA व्यवसायाची माहिती आणि वैयक्तिक डेटा कसा हाताळते.",
+      introduction: "परिचय",
+      introductionText:
+        "NEXORA ग्राहक, उत्पादने, ऑर्डर आणि संबंधित नोंदी व्यवस्थापित करण्यासाठी विक्री व व्यवसाय व्यवस्थापनाची सुविधा देते. ॲप वापरताना माहिती कशी हाताळली जाते, हे या धोरणात स्पष्ट केले आहे.",
+      information: "आम्ही हाताळत असलेली माहिती",
+      informationText: "ॲपच्या संरचनेनुसार, खालील माहितीचा समावेश असू शकतो:",
+      customerData: "ग्राहकांची नावे, फोन नंबर आणि वितरणाचे पत्ते.",
+      productData: "उत्पादनांचा तपशील, किंमती, प्रमाण आणि साठ्याच्या नोंदी.",
+      orderData: "ऑर्डरचा तपशील, पेमेंट पद्धती आणि व्यवहारांच्या नोंदी.",
+      applicationData: "ॲपची सेटिंग्ज आणि प्रवेशाशी संबंधित माहिती.",
+      usage: "माहितीचा वापर",
+      usageText:
+        "व्यवसायाचे कामकाज व्यवस्थापित करणे, ग्राहक व ऑर्डरच्या नोंदी ठेवणे, अहवाल तयार करणे आणि ॲपची कार्यक्षमता टिकवणे यासाठी माहिती वापरली जाते.",
+      security: "माहितीचे संग्रहण आणि सुरक्षा",
+      securityText:
+        "माहिती कुठे साठवली जाते आणि कोणते सुरक्षा उपाय वापरले जातात हे ॲपच्या तैनातीवर व संरचनेवर अवलंबून असते. अनधिकृत प्रवेश, माहिती हरवणे, बदल किंवा उघड होणे यापासून संरक्षण करण्यासाठी योग्य तांत्रिक आणि प्रशासकीय उपाय केले पाहिजेत.",
+      sharing: "माहितीची देवाणघेवाण आणि प्रकटीकरण",
+      sharingText:
+        "अधिकृत परवानगी असल्यास, सेवा चालवण्यासाठी आवश्यक असल्यास, कायद्याने आवश्यक असल्यास किंवा लागू कायद्यानुसार परवानगी असल्यासच वैयक्तिक किंवा व्यवसायाची माहिती सामायिक करावी.",
+      retention: "माहिती जतन करणे आणि हटवणे",
+      retentionText:
+        "नोंदी व्यवसाय, कायदेशीर आणि कार्यात्मक गरजांसाठी आवश्यक असेपर्यंतच जतन कराव्यात. माहिती हटवण्याच्या विनंत्यांचा विचार लागू नियम आणि बॅकअप प्रक्रियेनुसार करावा.",
+      contact: "संपर्क",
+      contactText:
+        "गोपनीयतेसंबंधी प्रश्न किंवा विनंत्यांसाठी आपल्या NEXORA आवृत्तीसोबत दिलेल्या अधिकृत संपर्क तपशीलांद्वारे ॲपच्या मालकाशी संपर्क साधा.",
+    },
+
+    copyright: {
+      title: "कॉपीराइट आणि बौद्धिक संपदा",
+      description:
+        "NEXORA मधील मूळ काम, ब्रँडची ओळख आणि संबंधित सामग्रीचे संरक्षण.",
+      ownership: "मालकी हक्क",
+      ownershipText:
+        "मूळ सॉफ्टवेअर कोड, दृश्य रचना, लोगो, ब्रँड सामग्री आणि दस्तऐवज संबंधित हक्कधारकांच्या मालकीचे आहेत किंवा त्यांच्या परवान्याअंतर्गत वापरले जातात. ग्राहक आणि व्यवसायाच्या डेटावर त्या डेटाला लागू असलेले हक्क व जबाबदाऱ्या लागू राहतात.",
+      restrictions: "पुनर्वापरावरील निर्बंध",
+      restrictionsText:
+        "लेखी परवानगी नसल्यास किंवा लागू कायद्यानुसार परवानगी नसल्यास, NEXORA ची संरक्षित सामग्री कॉपी करणे, प्रकाशित करणे, पुनर्वितरित करणे, पुनर्विक्री करणे किंवा व्यावसायिक वापर करणे अनुमत नाही.",
+      permission: "परवानगीची विनंती",
+      permissionText:
+        "स्रोत कोड, ब्रँडिंग, ग्राफिक्स किंवा इतर संरक्षित सामग्रीचा पुनर्वापर करण्यासाठी, सामग्री आणि प्रस्तावित वापराचा तपशील देऊन ॲपच्या मालकाकडे विनंती करा.",
+      infringement: "हक्कभंगाची तक्रार",
+      infringementText:
+        "NEXORA ची संरक्षित सामग्री परवानगीशिवाय वापरली जात असल्याचे वाटल्यास, संबंधित तपशील आणि पुरावे अधिकृत संपर्क माध्यमातून सादर करा.",
+    },
 
     brandSubtitle: "विक्री व्यवस्थापन",
 
@@ -1289,6 +1559,143 @@ export const translations = {
 
   hi: {
     // App and navigation*
+
+    footer: {
+      tagline: "स्मार्ट बिक्री। मज़बूत व्यवसाय।",
+      description:
+        "बिक्री को आसान बनाएँ, व्यावसायिक कार्यों को व्यवस्थित रखें और हर ऑर्डर को आत्मविश्वास से प्रबंधित करें।",
+      explore: "एक्सप्लोर करें",
+      dashboard: "डैशबोर्ड",
+      customers: "ग्राहक",
+      products: "उत्पाद",
+      orders: "ऑर्डर",
+      legalSecurity: "कानूनी जानकारी और सुरक्षा",
+      privacyPolicy: "गोपनीयता नीति",
+      terms: "नियम और शर्तें",
+      copyright: "कॉपीराइट",
+      security: "सुरक्षा नीति",
+      allPolicies: "सभी नीतियाँ",
+      connect: "हमसे जुड़ें",
+      contactText:
+        "कोई प्रश्न है या हमारे मूल कार्य का पुनः उपयोग करना चाहते हैं? एप्लिकेशन के मालिक से संपर्क करें।",
+      followUs: "हमें फ़ॉलो करें",
+      copyrightNotice: "सर्वाधिकार सुरक्षित।",
+    },
+
+    terms: {
+      title: "नियम और शर्तें",
+      description:
+        "NEXORA की अधिकृत पहुँच और उपयोग को नियंत्रित करने वाले नियम।",
+      acceptance: "शर्तों की स्वीकृति",
+      acceptanceText:
+        "NEXORA का उपयोग करने या उस तक पहुँचने पर, आप इन शर्तों और सभी लागू कानूनों का पालन करने के लिए सहमत होते हैं। यदि आप सहमत नहीं हैं, तो एप्लिकेशन का उपयोग बंद कर दें।",
+      authorizedUse: "अधिकृत उपयोग",
+      lawfulUse:
+        "एप्लिकेशन का उपयोग केवल वैध और अधिकृत व्यावसायिक उद्देश्यों के लिए करें।",
+      accurateRecords: "व्यवसाय और ग्राहकों के सही रिकॉर्ड प्रदान करें।",
+      credentials: "लॉगिन और पहुँच संबंधी जानकारी गोपनीय रखें।",
+      securityControls:
+        "पहुँच नियंत्रण को दरकिनार करने या सुरक्षा से समझौता करने का प्रयास न करें।",
+      intellectualProperty: "बौद्धिक संपदा",
+      intellectualPropertyText:
+        "जब तक अन्यथा न कहा गया हो, NEXORA का मूल सोर्स कोड, इंटरफ़ेस डिज़ाइन, ब्रांडिंग, लोगो, ग्राफिक्स और दस्तावेज़ संबंधित अधिकार धारकों के स्वामित्व में हैं या उनके लाइसेंस के अंतर्गत उपयोग किए जाते हैं। ये लागू बौद्धिक संपदा कानूनों के तहत संरक्षित हैं।",
+      intellectualPropertyText2:
+        "लागू कानून द्वारा अनुमति प्राप्त मामलों को छोड़कर, पूर्व लिखित अनुमति के बिना संरक्षित सामग्री की प्रतिलिपि बनाना, पुनः प्रकाशित करना, पुनर्वितरित करना, बेचना, उप-लाइसेंस देना या उस पर आधारित नया कार्य बनाना अनुमत नहीं है।",
+      dataResponsibility: "डेटा और खाते की ज़िम्मेदारी",
+      dataResponsibilityText:
+        "एप्लिकेशन में दर्ज जानकारी की सटीकता सुनिश्चित करना और उसे संग्रहीत व संसाधित करने के लिए आवश्यक अनुमति रखना आपकी ज़िम्मेदारी है।",
+      backupText:
+        "उचित बैकअप रखें। यह न मानें कि ब्राउज़र या डिवाइस में संग्रहीत जानकारी का बैकअप अपने आप लिया जाता है।",
+      prohibitedActivities: "निषिद्ध गतिविधियाँ",
+      unauthorizedCopying:
+        "संरक्षित सामग्री की अनधिकृत प्रतिलिपि बनाना, वितरण करना या व्यावसायिक पुनः उपयोग करना।",
+      reverseEngineering:
+        "कानून द्वारा अनुमत मामलों को छोड़कर, बिना अनुमति रिवर्स इंजीनियरिंग या सुरक्षा परीक्षण करना।",
+      unauthorizedAccess:
+        "किसी अन्य व्यक्ति के रिकॉर्ड या खाते तक अनधिकृत पहुँच प्राप्त करना।",
+      unlawfulActivities:
+        "एप्लिकेशन का उपयोग गैरकानूनी, धोखाधड़ीपूर्ण या हानिकारक गतिविधियों के लिए करना।",
+      availability: "उपलब्धता और सीमाएँ",
+      availabilityText:
+        "सुविधाएँ बदल सकती हैं और निर्बाध उपलब्धता की गारंटी नहीं दी जा सकती। कानून द्वारा अनुमत सीमा तक, एप्लिकेशन अपनी दस्तावेज़ीकृत कार्यक्षमता और लागू वारंटी या उपभोक्ता संरक्षण के अधीन प्रदान किया जाता है।",
+      termination: "निलंबन और समाप्ति",
+      terminationText:
+        "लागू समझौतों और कानून के अधीन, अनधिकृत उपयोग, सुरक्षा जोखिम या अन्य वैध कारणों से पहुँच निलंबित या समाप्त की जा सकती है।",
+      changesContact: "बदलाव और संपर्क",
+      changesContactText:
+        "एप्लिकेशन या उसकी आवश्यकताओं में बदलाव होने पर इन शर्तों को अपडेट किया जा सकता है। जहाँ उचित हो, महत्वपूर्ण बदलावों की सूचना दी जानी चाहिए। इन शर्तों या संरक्षित सामग्री के पुनः उपयोग की अनुमति से संबंधित प्रश्नों के लिए एप्लिकेशन के मालिक से संपर्क करें।",
+    },
+
+    security: {
+      title: "सुरक्षा और पहुँच नीति",
+      description:
+        "NEXORA की पहुँच और व्यावसायिक जानकारी को सुरक्षित रखने के लिए दिशानिर्देश।",
+      authorizedAccess: "अधिकृत पहुँच",
+      authorizedAccessText:
+        "पहुँच केवल अधिकृत उपयोगकर्ताओं तक सीमित होनी चाहिए। एक्सेस कोड या लॉगिन जानकारी अनधिकृत लोगों के साथ साझा न करें।",
+      protectDevice: "अपने डिवाइस को सुरक्षित रखें",
+      devicePassword:
+        "डिवाइस के लिए मज़बूत पासवर्ड का उपयोग करें और ब्राउज़र को अपडेट रखें।",
+      lockDevice: "डिवाइस का उपयोग न करते समय उसे लॉक करें।",
+      avoidSharedDevices:
+        "अविश्वसनीय या साझा डिवाइस पर एप्लिकेशन का उपयोग करने से बचें।",
+      backups: "महत्वपूर्ण व्यावसायिक रिकॉर्ड का विश्वसनीय बैकअप रखें।",
+      reporting: "सुरक्षा समस्याओं की रिपोर्ट",
+      reportingText:
+        "अनधिकृत पहुँच, उजागर हुई लॉगिन जानकारी या डेटा में अप्रत्याशित बदलाव का संदेह होने पर तुरंत एप्लिकेशन के मालिक को सूचित करें। किसी समस्या की जाँच करने के लिए दूसरे उपयोगकर्ता की जानकारी तक पहुँच न बनाएँ और न ही उसे उजागर करें।",
+      limitations: "सुरक्षा की सीमाएँ",
+      limitationsText:
+        "केवल ब्राउज़र में दिखाई देने वाली एक्सेस स्क्रीन सर्वर द्वारा नियंत्रित प्रमाणीकरण प्रदान नहीं करती और न ही ऐसे व्यक्ति से डेटा सुरक्षित रखती है जो ब्राउज़र की जाँच या उसमें बदलाव कर सकता है। संवेदनशील व्यावसायिक डेटा के लिए उचित सर्वर-साइड एक्सेस नियंत्रण आवश्यक हैं।",
+    },
+
+    privacyPolicy: {
+      title: "गोपनीयता नीति",
+      description:
+        "NEXORA व्यावसायिक जानकारी और व्यक्तिगत डेटा को कैसे संभालता है।",
+      introduction: "परिचय",
+      introductionText:
+        "NEXORA ग्राहकों, उत्पादों, ऑर्डर और संबंधित रिकॉर्ड को प्रबंधित करने के लिए बिक्री और व्यवसाय प्रबंधन सुविधाएँ प्रदान करता है। यह नीति बताती है कि एप्लिकेशन का उपयोग करते समय जानकारी कैसे संभाली जाती है।",
+      information: "हम कौन-सी जानकारी संभालते हैं",
+      informationText:
+        "एप्लिकेशन की व्यवस्था के आधार पर, जानकारी में शामिल हो सकते हैं:",
+      customerData: "ग्राहकों के नाम, फ़ोन नंबर और डिलीवरी पते।",
+      productData: "उत्पादों का विवरण, कीमतें, मात्राएँ और स्टॉक रिकॉर्ड।",
+      orderData: "ऑर्डर का विवरण, भुगतान के तरीके और लेन-देन के रिकॉर्ड।",
+      applicationData: "एप्लिकेशन की सेटिंग्स और पहुँच से संबंधित जानकारी।",
+      usage: "जानकारी का उपयोग",
+      usageText:
+        "जानकारी का उपयोग व्यवसाय संचालन प्रबंधित करने, ग्राहक और ऑर्डर रिकॉर्ड बनाए रखने, रिपोर्ट तैयार करने और एप्लिकेशन की सुविधाएँ संचालित करने के लिए किया जाता है।",
+      security: "डेटा संग्रहण और सुरक्षा",
+      securityText:
+        "जानकारी कहाँ संग्रहीत होती है और कौन-से सुरक्षा उपाय लागू हैं, यह एप्लिकेशन की तैनाती और कॉन्फ़िगरेशन पर निर्भर करता है। अनधिकृत पहुँच, हानि, बदलाव या खुलासे से बचाने के लिए उचित तकनीकी और संगठनात्मक सुरक्षा उपाय अपनाए जाने चाहिए।",
+      sharing: "जानकारी साझा करना और प्रकटीकरण",
+      sharingText:
+        "व्यक्तिगत या व्यावसायिक जानकारी केवल अधिकृत होने पर, सेवा चलाने के लिए आवश्यक होने पर, कानून द्वारा आवश्यक होने पर या लागू कानून के तहत अनुमति होने पर ही साझा की जानी चाहिए।",
+      retention: "जानकारी रखना और हटाना",
+      retentionText:
+        "रिकॉर्ड केवल उतने समय तक रखे जाने चाहिए जितने समय तक व्यावसायिक, कानूनी और परिचालन आवश्यकताओं के लिए उचित रूप से आवश्यक हों। डेटा हटाने के अनुरोधों की समीक्षा लागू आवश्यकताओं और बैकअप प्रक्रियाओं के अनुसार की जानी चाहिए।",
+      contact: "संपर्क",
+      contactText:
+        "गोपनीयता से जुड़े प्रश्नों या अनुरोधों के लिए अपने NEXORA संस्करण के साथ दिए गए आधिकारिक संपर्क विवरण के माध्यम से एप्लिकेशन के मालिक से संपर्क करें।",
+    },
+
+    copyright: {
+      title: "कॉपीराइट और बौद्धिक संपदा",
+      description:
+        "NEXORA के मूल कार्य, ब्रांड पहचान और संबंधित सामग्री की सुरक्षा।",
+      ownership: "स्वामित्व",
+      ownershipText:
+        "मूल सॉफ्टवेयर कोड, विज़ुअल डिज़ाइन, लोगो, ब्रांड सामग्री और दस्तावेज़ संबंधित अधिकार धारकों के स्वामित्व में हैं या उनके लाइसेंस के अंतर्गत आते हैं। ग्राहक और व्यावसायिक डेटा पर उससे संबंधित लागू अधिकार और दायित्व लागू रहेंगे।",
+      restrictions: "पुनः उपयोग पर प्रतिबंध",
+      restrictionsText:
+        "लिखित अनुमति के बिना, या जहाँ लागू कानून इसकी अनुमति नहीं देता, NEXORA की संरक्षित सामग्री की प्रतिलिपि बनाना, प्रकाशित करना, पुनर्वितरित करना, पुनः बेचना या व्यावसायिक उपयोग करना अनुमत नहीं है।",
+      permission: "अनुमति का अनुरोध",
+      permissionText:
+        "सोर्स कोड, ब्रांडिंग, ग्राफिक्स या अन्य संरक्षित सामग्री का पुनः उपयोग करने के लिए, सामग्री और उसके प्रस्तावित उपयोग का विवरण देकर ऐप के मालिक से अनुमति माँगें।",
+      infringement: "उल्लंघन की रिपोर्ट",
+      infringementText:
+        "यदि आपको लगता है कि NEXORA की संरक्षित सामग्री का बिना अनुमति उपयोग किया गया है, तो संबंधित विवरण और प्रमाण आधिकारिक संपर्क माध्यम से भेजें।",
+    },
 
     brandSubtitle: "सेल्स प्रबंधन",
 

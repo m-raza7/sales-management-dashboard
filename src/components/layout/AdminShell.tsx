@@ -11,7 +11,6 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Menu,
   Search,
   X,
   ArrowRight,
@@ -19,15 +18,11 @@ import {
   Users,
   Package,
   ShoppingCart,
-  Settings2,
 } from "lucide-react";
-import Link from "next/link";
-import Image from "next/image";
 
 import Sidebar from "./Sidebar";
-import ThemeToggle from "@/components/common/ThemeToggle";
-import LanguageSwitcher from "@/components/common/LanguageSwitcher";
-import { useLanguage } from "@/components/providers/LanguageProvider";
+import AppHeader from "@/components/common/AppHeader";
+import AppFooter from "@/components/common/AppFooter";
 
 type SearchItem = {
   label: string;
@@ -92,6 +87,13 @@ const searchItems: SearchItem[] = [
     href: "/orders/new",
     icon: ShoppingCart,
     keywords: ["create order", "place order", "sales order"],
+  },
+  {
+    label: "Legal & Security",
+    description: "Privacy, terms, copyright, and security policies",
+    href: "/legal",
+    icon: LayoutDashboard,
+    keywords: ["privacy", "terms", "copyright", "security", "policies"],
   },
 ];
 
@@ -161,15 +163,12 @@ function SearchResults({ results, onNavigate, onClose }: SearchResultsProps) {
 
 export default function AdminShell({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const { t } = useLanguage();
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const searchContainerRef = useRef<HTMLDivElement>(null);
-  const mobileSettingsRef = useRef<HTMLDetailsElement>(null);
   const desktopSearchInputRef = useRef<HTMLInputElement>(null);
   const mobileSearchInputRef = useRef<HTMLInputElement>(null);
 
@@ -185,25 +184,16 @@ export default function AdminShell({ children }: { children: ReactNode }) {
     [query],
   );
 
-  const closeSettings = useCallback(() => {
-    setSettingsOpen(false);
-    setSearchOpen(false);
-  }, []);
-
   const closeSearch = useCallback(() => {
     setSearchOpen(false);
   }, []);
 
   const focusSearch = useCallback(() => {
-    const isMobile = window.matchMedia("(max-width: 767px)").matches;
-
-    if (isMobile) {
-      setSettingsOpen(true);
-    }
-
     setSearchOpen(true);
 
     window.requestAnimationFrame(() => {
+      const isMobile = window.matchMedia("(max-width: 767px)").matches;
+
       if (isMobile) {
         mobileSearchInputRef.current?.focus();
       } else {
@@ -216,7 +206,6 @@ export default function AdminShell({ children }: { children: ReactNode }) {
     (href: string) => {
       setSearchOpen(false);
       setSearch("");
-      setSettingsOpen(false);
       setMobileOpen(false);
       router.push(href);
     },
@@ -235,31 +224,12 @@ export default function AdminShell({ children }: { children: ReactNode }) {
   );
 
   useEffect(() => {
-    // Keep the native details element synchronized with React state.
-    if (mobileSettingsRef.current) {
-      mobileSettingsRef.current.open = settingsOpen;
-    }
-  }, [settingsOpen]);
-
-  useEffect(() => {
     function handleOutsideClick(event: PointerEvent) {
       const target = event.target;
 
-      if (!(target instanceof Node)) {
-        return;
-      }
+      if (!(target instanceof Node)) return;
 
-      const insideMobileSettings =
-        mobileSettingsRef.current?.contains(target) ?? false;
-
-      const insideDesktopSearch =
-        searchContainerRef.current?.contains(target) ?? false;
-
-      if (!insideMobileSettings) {
-        setSettingsOpen(false);
-      }
-
-      if (!insideDesktopSearch && !insideMobileSettings) {
+      if (!searchContainerRef.current?.contains(target)) {
         setSearchOpen(false);
       }
     }
@@ -286,7 +256,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
       }
 
       if (event.key === "Escape") {
-        closeSettings();
+        closeSearch();
         desktopSearchInputRef.current?.blur();
         mobileSearchInputRef.current?.blur();
         setMobileOpen(false);
@@ -300,74 +270,103 @@ export default function AdminShell({ children }: { children: ReactNode }) {
       document.removeEventListener("pointerdown", handleOutsideClick);
       document.removeEventListener("keydown", handleKeyboard);
     };
-  }, [closeSettings, focusSearch]);
+  }, [closeSearch, focusSearch]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Sidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
 
-      <div className="min-h-screen min-w-0 lg:pl-[272px]">
-        <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-xl">
-          <div className="flex h-14 w-full min-w-0 items-center gap-2 px-2.5 min-[400px]:gap-2.5 min-[400px]:px-3 sm:h-[68px] sm:gap-3 sm:px-5 lg:px-6">
-            {/* Mobile and tablet menu */}
-            <button
-              type="button"
-              onClick={() => setMobileOpen((previous) => !previous)}
-              aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
-              aria-expanded={mobileOpen}
-              aria-controls="app-sidebar"
-              className="flex size-9 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-muted sm:size-10 lg:hidden"
+      <div className="flex min-h-screen min-w-0 flex-col lg:pl-[272px]">
+        <AppHeader
+          mobileOpen={mobileOpen}
+          onMenuClick={() => setMobileOpen((previous) => !previous)}
+        />
+
+        {/* Search bar */}
+        <div className="border-border bg-background px-4 py-3 sm:px-6 lg:px-8">
+          <div
+            ref={searchContainerRef}
+            className="relative mx-auto w-full max-w-[1600px]"
+          >
+            <form
+              onSubmit={handleSearchSubmit}
+              role="search"
+              className="relative"
             >
-              {mobileOpen ? <X size={19} /> : <Menu size={19} />}
-            </button>
+              <Search
+                size={18}
+                className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground"
+              />
 
-            {/* Responsive Nexora branding */}
+              <input
+                ref={desktopSearchInputRef}
+                type="search"
+                value={search}
+                onChange={(event) => {
+                  setSearch(event.target.value);
+                  setSearchOpen(true);
+                }}
+                onFocus={() => setSearchOpen(true)}
+                placeholder="Search customers, products, orders..."
+                aria-label="Search the application"
+                aria-expanded={searchOpen}
+                className="hidden h-11 w-full rounded-xl border border-border bg-card pl-11 pr-11 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-emerald-700/50 focus:ring-2 focus:ring-emerald-700/10 md:block md:max-w-xl"
+              />
 
-            <Link
-              href="/dashboard"
-              aria-label="Nexora Sales Management home"
-              className="flex min-w-0 flex-1 items-center gap-2 sm:flex-none sm:gap-2.5 lg:w-[220px]"
-            >
-              {/* Logo: hidden on narrow mobile screens */}
-              <div className="relative hidden size-8 shrink-0 min-[400px]:block sm:size-10">
-                <Image
-                  src="/images/Glossy Emerald and Gold Ribbon N Logo.png"
-                  alt=""
-                  fill
-                  priority
-                  sizes="40px"
-                  className="rounded-lg object-contain"
-                />
-              </div>
+              <input
+                ref={mobileSearchInputRef}
+                type="search"
+                value={search}
+                onChange={(event) => {
+                  setSearch(event.target.value);
+                  setSearchOpen(true);
+                }}
+                onFocus={() => setSearchOpen(true)}
+                placeholder="Search..."
+                aria-label="Search the application"
+                aria-expanded={searchOpen}
+                className="h-10 w-full rounded-xl border border-border bg-card pl-10 pr-10 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-emerald-700/50 focus:ring-2 focus:ring-emerald-700/10 md:hidden"
+              />
 
-              {/* Brand text */}
-              <div className="min-w-0 leading-none max-[400px]:mt-[6px]">
-                <span className="nexora-shine block truncate text-base font-extrabold leading-none tracking-[0.06em] min-[376px]:text-sm min-[376px]:tracking-[0.08em] sm:text-xl sm:tracking-[0.12em]">
-                  NEXORA
+              {search && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearch("");
+                    setSearchOpen(true);
+                    focusSearch();
+                  }}
+                  aria-label="Clear search"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                >
+                  <X size={16} />
+                </button>
+              )}
+
+              {!search && (
+                <span className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rounded-md border border-border px-2 py-1 text-[10px] text-muted-foreground md:block">
+                  Ctrl K
                 </span>
+              )}
+            </form>
 
-                <span className="mt-0 hidden truncate text-[9px] font-semibold uppercase leading-none tracking-[0.16em] text-muted-foreground min-[400px]:block">
-                  Sales Management
-                </span>
-              </div>
-            </Link>
-
-            {/* Language and theme controls */}
-            <div className="ml-auto flex shrink-0 items-center gap-1 min-[400px]:gap-1.5 sm:gap-2">
-              <LanguageSwitcher />
-              <ThemeToggle />
-            </div>
+            {searchOpen && (
+              <SearchResults
+                results={filteredResults}
+                onNavigate={navigateTo}
+                onClose={closeSearch}
+              />
+            )}
           </div>
-        </header>
+        </div>
 
-        {/* Main content */}
-        <main className="mx-auto w-full max-w-[1600px] p-4 sm:p-6 lg:p-8">
+        {/* Main page content */}
+        <main className="mx-auto w-full max-w-[1600px] flex-1 p-4 sm:p-6 lg:p-8">
           {children}
-
-          <footer className="mt-10 border-t border-border py-5 text-center text-xs text-muted-foreground">
-            © {new Date().getFullYear()} {t("brand")} · {t("footerTagline")}
-          </footer>
         </main>
+
+        {/* Shared footer */}
+        <AppFooter />
       </div>
     </div>
   );
