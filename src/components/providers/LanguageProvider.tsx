@@ -8,6 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+
 import {
   translations,
   type Language,
@@ -25,6 +26,12 @@ const LanguageContext = createContext<LanguageContextValue | null>(null);
 
 const STORAGE_KEY = "sales-management-language";
 
+const LANGUAGE_LOCALES: Record<Language, string> = {
+  en: "en",
+  mr: "mr-IN",
+  hi: "hi-IN",
+};
+
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>("en");
   const [mounted, setMounted] = useState(false);
@@ -41,34 +48,37 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const setLanguage = useCallback((nextLanguage: Language) => {
     setLanguageState(nextLanguage);
+
     localStorage.setItem(STORAGE_KEY, nextLanguage);
-
-    const locale = {
-      en: "en",
-      mr: "mr-IN",
-      hi: "hi-IN",
-    }[nextLanguage];
-
-    document.documentElement.lang = locale;
+    document.documentElement.lang = LANGUAGE_LOCALES[nextLanguage];
   }, []);
 
   useEffect(() => {
     if (!mounted) return;
 
-    document.documentElement.lang = {
-      en: "en",
-      mr: "mr-IN",
-      hi: "hi-IN",
-    }[language];
+    document.documentElement.lang = LANGUAGE_LOCALES[language];
   }, [language, mounted]);
 
   const t = useCallback(
-    (key: TranslationKey) => translations[language][key],
+    (key: TranslationKey): string => {
+      const value = translations[language][key];
+
+      // Translation keys used by t() must resolve to strings.
+      // Prevent nested translation objects from being returned.
+      return typeof value === "string" ? value : String(key);
+    },
     [language],
   );
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, mounted }}>
+    <LanguageContext.Provider
+      value={{
+        language,
+        setLanguage,
+        t,
+        mounted,
+      }}
+    >
       {children}
     </LanguageContext.Provider>
   );
