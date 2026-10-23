@@ -2336,4 +2336,8 @@ export const translations = {
   },
 } as const;
 
-export type TranslationKey = keyof typeof translations.en;
+export type TranslationKey = {
+  [K in keyof typeof translations.en]: (typeof translations.en)[K] extends string
+    ? K
+    : never;
+}[keyof typeof translations.en];

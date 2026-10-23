@@ -60,16 +60,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, [language, mounted]);
 
   const t = useCallback(
-    (key: TranslationKey): string => {
-      const dictionary = translations[language] as unknown as Record<
-        string,
-        unknown
-      >;
-
-      const value = dictionary[key];
-
-      return typeof value === "string" ? value : String(key);
-    },
+    (key: TranslationKey): string => translations[language][key],
     [language],
   );
 
