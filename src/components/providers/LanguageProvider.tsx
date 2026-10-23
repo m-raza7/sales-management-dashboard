@@ -61,10 +61,13 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const t = useCallback(
     (key: TranslationKey): string => {
-      const value = translations[language][key];
+      const dictionary = translations[language] as unknown as Record<
+        string,
+        unknown
+      >;
 
-      // Translation keys used by t() must resolve to strings.
-      // Prevent nested translation objects from being returned.
+      const value = dictionary[key];
+
       return typeof value === "string" ? value : String(key);
     },
     [language],
