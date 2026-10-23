@@ -10,9 +10,11 @@ export default function TermsPage() {
 
   return (
     <LegalPageLayout title={t.title} description={t.description}>
-      <section>
-        <h2>1. {t.acceptance}</h2>
-        <p>{t.acceptanceText}</p>
+      <section className="space-y-3">
+        <h2 className="text-lg font-semibold text-foreground">
+          1. {t.acceptance}
+        </h2>
+        <p className="leading-7 text-muted-foreground">{t.acceptanceText}</p>
       </section>
 
       <section>

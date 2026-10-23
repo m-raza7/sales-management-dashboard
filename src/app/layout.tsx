@@ -1,13 +1,23 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import ThemeProvider from "@/components/providers/ThemeProvider";
 import LocalAccessLock from "@/components/auth/LocalAccessLock";
 import CapacitorBackButton from "@/components/CapacitorBackButton";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title:
-    "Nexora | Sales & Business Management | Professional, all-round business platform",
-  description: "Manage customers, products and orders from one workspace.",
+  title: {
+    default: "NEXORA | Sales Management",
+    template: "%s | NEXORA",
+  },
+  description:
+    "Manage customers, products, and orders from one professional business workspace.",
+  applicationName: "NEXORA",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#047857",
 };
 
 export default function RootLayout({
@@ -18,10 +28,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <CapacitorBackButton />
-        <LocalAccessLock>
-          <ThemeProvider>{children}</ThemeProvider>
-        </LocalAccessLock>
+        <ThemeProvider>
+          <CapacitorBackButton />
+          <LocalAccessLock>{children}</LocalAccessLock>
+        </ThemeProvider>
       </body>
     </html>
   );
