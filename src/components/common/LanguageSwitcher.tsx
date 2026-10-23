@@ -17,7 +17,10 @@ export default function LanguageSwitcher() {
   const { language, setLanguage, mounted } = useLanguage();
 
   const [isOpen, setIsOpen] = useState(false);
+
   const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const selectedLanguage =
     languages.find((item) => item.value === language) ?? languages[0];
@@ -31,13 +34,16 @@ export default function LanguageSwitcher() {
         containerRef.current &&
         !containerRef.current.contains(target)
       ) {
+        // Do not steal focus from the element the user clicked.
         setIsOpen(false);
       }
     }
 
     function handleKeyboard(event: KeyboardEvent) {
-      if (event.key === "Escape") {
+      if (event.key === "Escape" && isOpen) {
+        event.preventDefault();
         setIsOpen(false);
+        triggerRef.current?.focus();
       }
     }
 
@@ -48,20 +54,34 @@ export default function LanguageSwitcher() {
       document.removeEventListener("pointerdown", handleOutsideClick);
       document.removeEventListener("keydown", handleKeyboard);
     };
-  }, []);
+  }, [isOpen]);
+
+  // If the dropdown closes while an option has focus,
+  // move focus to the trigger before hiding the dropdown.
+  useEffect(() => {
+    if (!isOpen && dropdownRef.current?.contains(document.activeElement)) {
+      triggerRef.current?.focus();
+    }
+  }, [isOpen]);
 
   function handleLanguageChange(value: Language) {
     setLanguage(value);
     setIsOpen(false);
+    triggerRef.current?.focus();
+  }
+
+  function toggleDropdown() {
+    setIsOpen((previous) => !previous);
   }
 
   return (
     <div ref={containerRef} className="relative inline-flex min-w-0 shrink-0">
       {/* Language selector button */}
       <button
+        ref={triggerRef}
         type="button"
         disabled={!mounted}
-        onClick={() => setIsOpen((previous) => !previous)}
+        onClick={toggleDropdown}
         aria-label="Select language"
         aria-haspopup="listbox"
         aria-expanded={isOpen}
@@ -96,6 +116,9 @@ export default function LanguageSwitcher() {
 
       {/* Animated dropdown */}
       <div
+        ref={dropdownRef}
+        inert={!isOpen}
+        aria-hidden={!isOpen}
         className={`
           absolute right-0 top-full z-[100] mt-2
           w-48 origin-top-right overflow-hidden
@@ -110,7 +133,6 @@ export default function LanguageSwitcher() {
               : "invisible -translate-y-2 scale-95 opacity-0"
           }
         `}
-        aria-hidden={!isOpen}
       >
         <p className="px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
           Choose language
@@ -148,7 +170,7 @@ export default function LanguageSwitcher() {
 
                 {selected && (
                   <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white dark:bg-emerald-500">
-                    <Check size={12} strokeWidth={2.5} />
+                    <Check size={12} strokeWidth={2.5} aria-hidden="true" />
                   </span>
                 )}
               </button>
