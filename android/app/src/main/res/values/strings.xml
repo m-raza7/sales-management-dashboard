@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Sales Manager</string>
-    <string name="title_activity_main">Sales Manager</string>
+    <string name="app_name">NEXORA</string>
+    <string name="title_activity_main">NEXORA</string>
     <string name="package_name">com.yourcompany.salesmanager</string>
     <string name="custom_url_scheme">com.yourcompany.salesmanager</string>
 </resources>
