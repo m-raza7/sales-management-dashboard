@@ -46,9 +46,24 @@ const unitKeys = [
   { value: "bottle", key: "productFormUnitBottle" },
   { value: "can", key: "productFormUnitCan" },
   { value: "litre", key: "productFormUnitLitre" },
+  { value: "millilitre", key: "productFormUnitMillilitre" },
   { value: "kg", key: "productFormUnitKilogram" },
+  { value: "gram", key: "productFormUnitGram" },
+  { value: "milligram", key: "productFormUnitMilligram" },
+  { value: "tonne", key: "productFormUnitTonne" },
   { value: "packet", key: "productFormUnitPacket" },
+  { value: "pack", key: "productFormUnitPack" },
   { value: "dozen", key: "productFormUnitDozen" },
+  { value: "pair", key: "productFormUnitPair" },
+  { value: "set", key: "productFormUnitSet" },
+  { value: "bundle", key: "productFormUnitBundle" },
+  { value: "roll", key: "productFormUnitRoll" },
+  { value: "metre", key: "productFormUnitMetre" },
+  { value: "centimetre", key: "productFormUnitCentimetre" },
+  { value: "bag", key: "productFormUnitBag" },
+  { value: "jar", key: "productFormUnitJar" },
+  { value: "carton", key: "productFormUnitCarton" },
+  { value: "tray", key: "productFormUnitTray" },
 ] as const;
 
 export default function ProductForm({ product }: { product?: Product }) {
@@ -249,7 +264,7 @@ export default function ProductForm({ product }: { product?: Product }) {
           </h3>
         </div>
 
-        <div className="grid min-w-0 grid-cols-1 gap-5 sm:grid-cols-2">
+        <div className="grid items-center min-w-0 grid-cols-1 gap-5 sm:grid-cols-2">
           <label className={labelClass}>
             <span className="flex items-center gap-2">
               <Ruler size={15} className="text-muted-foreground" />

@@ -4,6 +4,22 @@ export const translations = {
   en: {
     // App and navigation*
 
+    productFormUnitMillilitre: "Millilitre (mL)",
+    productFormUnitGram: "Gram (g)",
+    productFormUnitMilligram: "Milligram (mg)",
+    productFormUnitTonne: "Tonne (t)",
+    productFormUnitPack: "Pack",
+    productFormUnitPair: "Pair",
+    productFormUnitSet: "Set",
+    productFormUnitBundle: "Bundle",
+    productFormUnitRoll: "Roll",
+    productFormUnitMetre: "Metre (m)",
+    productFormUnitCentimetre: "Centimetre (cm)",
+    productFormUnitBag: "Bag",
+    productFormUnitJar: "Jar",
+    productFormUnitCarton: "Carton",
+    productFormUnitTray: "Tray",
+
     footer: {
       tagline: "Smarter Sales. Stronger Business.",
       description:
@@ -782,6 +798,22 @@ export const translations = {
   mr: {
     // App and navigation*
 
+    productFormUnitMillilitre: "मिलिलिटर (mL)",
+    productFormUnitGram: "ग्रॅम (g)",
+    productFormUnitMilligram: "मिलिग्रॅम (mg)",
+    productFormUnitTonne: "टन (t)",
+    productFormUnitPack: "पॅक",
+    productFormUnitPair: "जोडी",
+    productFormUnitSet: "संच",
+    productFormUnitBundle: "बंडल",
+    productFormUnitRoll: "रोल",
+    productFormUnitMetre: "मीटर (m)",
+    productFormUnitCentimetre: "सेंटीमीटर (cm)",
+    productFormUnitBag: "पोती",
+    productFormUnitJar: "जार",
+    productFormUnitCarton: "कार्टन",
+    productFormUnitTray: "ट्रे",
+
     footer: {
       tagline: "स्मार्ट विक्री. मजबूत व्यवसाय.",
       description:
@@ -1559,6 +1591,22 @@ export const translations = {
 
   hi: {
     // App and navigation*
+
+    productFormUnitMillilitre: "मिलीलीटर (mL)",
+    productFormUnitGram: "ग्राम (g)",
+    productFormUnitMilligram: "मिलीग्राम (mg)",
+    productFormUnitTonne: "टन (t)",
+    productFormUnitPack: "पैक",
+    productFormUnitPair: "जोड़ी",
+    productFormUnitSet: "सेट",
+    productFormUnitBundle: "बंडल",
+    productFormUnitRoll: "रोल",
+    productFormUnitMetre: "मीटर (m)",
+    productFormUnitCentimetre: "सेंटीमीटर (cm)",
+    productFormUnitBag: "बोरी",
+    productFormUnitJar: "जार",
+    productFormUnitCarton: "कार्टन",
+    productFormUnitTray: "ट्रे",
 
     footer: {
       tagline: "स्मार्ट बिक्री। मज़बूत व्यवसाय।",
