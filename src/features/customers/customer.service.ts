@@ -43,3 +43,27 @@ export function deleteCustomer(id: string): void {
     customers.filter((customer) => customer.id !== id),
   );
 }
+
+/**
+ * Search saved customers by any field.
+ * Supports voice-search text and normal typed search.
+ */
+export function searchCustomers(query: string): Customer[] {
+  const normalizedQuery = query.trim().toLowerCase();
+
+  if (!normalizedQuery) {
+    return [];
+  }
+
+  const customers = getCustomers();
+
+  return customers.filter((customer) =>
+    Object.values(customer).some((value) => {
+      if (value === null || value === undefined) {
+        return false;
+      }
+
+      return String(value).toLowerCase().includes(normalizedQuery);
+    }),
+  );
+}

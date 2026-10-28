@@ -107,3 +107,30 @@ export function deleteOrder(id: string): void {
 
   writeData(STORAGE_KEYS.orders, updatedOrders);
 }
+
+/**
+ * Search saved orders for voice search and text search.
+ * Searches order IDs, order numbers, customer details,
+ * status, product details, amounts, and other stored fields.
+ */
+export function searchOrders(query: string): Order[] {
+  const normalizedQuery = query.trim().toLowerCase();
+
+  if (!normalizedQuery) {
+    return [];
+  }
+
+  return getOrders().filter((order) =>
+    Object.values(order).some((value) => {
+      if (value === null || value === undefined) {
+        return false;
+      }
+
+      if (typeof value === "object") {
+        return JSON.stringify(value).toLowerCase().includes(normalizedQuery);
+      }
+
+      return String(value).toLowerCase().includes(normalizedQuery);
+    }),
+  );
+}

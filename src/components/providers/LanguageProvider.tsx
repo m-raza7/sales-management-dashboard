@@ -41,6 +41,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
     if (saved === "en" || saved === "mr" || saved === "hi") {
       setLanguageState(saved);
+      document.documentElement.lang = LANGUAGE_LOCALES[saved];
+    } else {
+      document.documentElement.lang = LANGUAGE_LOCALES.en;
     }
 
     setMounted(true);
@@ -52,12 +55,6 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(STORAGE_KEY, nextLanguage);
     document.documentElement.lang = LANGUAGE_LOCALES[nextLanguage];
   }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-
-    document.documentElement.lang = LANGUAGE_LOCALES[language];
-  }, [language, mounted]);
 
   const t = useCallback(
     (key: TranslationKey): string => translations[language][key],
