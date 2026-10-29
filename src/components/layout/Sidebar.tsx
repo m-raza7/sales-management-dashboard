@@ -79,14 +79,14 @@ export default function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
             </span>
           </Link>
 
-          <button
+          {/* <button
             type="button"
             onClick={onClose}
             aria-label="Close navigation menu"
             className="flex size-9 shrink-0 items-center justify-center rounded-lg text-white/70 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D8B66A] lg:hidden"
           >
             <X size={19} />
-          </button>
+          </button> */}
         </div>
 
         {/* Section label */}

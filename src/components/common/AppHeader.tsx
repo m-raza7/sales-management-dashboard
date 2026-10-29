@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
+
 import ThemeToggle from "@/components/common/ThemeToggle";
 import LanguageSwitcher from "@/components/common/LanguageSwitcher";
 
@@ -14,48 +15,49 @@ type AppHeaderProps = {
 export default function AppHeader({ mobileOpen, onMenuClick }: AppHeaderProps) {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-xl">
-      <div className="flex h-14 w-full min-w-0 items-center gap-2 px-2.5 min-[400px]:gap-2.5 min-[400px]:px-3 sm:h-[68px] sm:gap-3 sm:px-5 lg:px-6">
-        <button
-          type="button"
-          onClick={onMenuClick}
-          aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
-          aria-expanded={mobileOpen}
-          aria-controls="app-sidebar"
-          className="flex size-9 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-muted sm:size-10 lg:hidden"
-        >
-          {mobileOpen ? <X size={19} /> : <Menu size={19} />}
-        </button>
-
+      <div className="flex h-16 w-full items-center gap-3 px-3 sm:h-[72px] sm:px-5 lg:px-6">
+        {/* Brand on the left */}
         <Link
           href="/dashboard"
           aria-label="NEXORA Sales Management home"
-          className="flex min-w-0 flex-1 items-center gap-2 sm:flex-none sm:gap-2.5 lg:w-[220px]"
+          className="flex min-w-0 shrink-0 items-center gap-2.5"
         >
-          <div className="relative hidden size-8 shrink-0 min-[400px]:block sm:size-10">
+          <div className="relative size-9 shrink-0 sm:size-11">
             <Image
               src="/images/Glossy Emerald and Gold Ribbon N Logo.png"
-              alt=""
+              alt="NEXORA logo"
               fill
               priority
-              sizes="40px"
-              className="rounded-lg object-contain"
+              sizes="44px"
+              className="object-contain"
             />
           </div>
 
-          <div className="min-w-0 leading-none max-[400px]:mt-[6px]">
-            <span className="nexora-shine block truncate text-base font-extrabold leading-none tracking-[0.06em] min-[376px]:text-sm min-[376px]:tracking-[0.08em] sm:text-xl sm:tracking-[0.12em]">
+          <div className="min-w-0">
+            <span className="nexora-shine block text-base font-extrabold leading-tight tracking-[0.06em] sm:text-xl sm:tracking-[0.1em]">
               NEXORA
             </span>
-
-            <span className="mt-0 hidden truncate text-[9px] font-semibold uppercase leading-none tracking-[0.16em] text-muted-foreground min-[400px]:block">
+            <span className="mt-0.5 block whitespace-nowrap text-[8px] font-bold uppercase tracking-[0.13em] text-muted-foreground sm:text-[9px]">
               Sales Management
             </span>
           </div>
         </Link>
 
-        <div className="ml-auto flex shrink-0 items-center gap-1 min-[400px]:gap-1.5 sm:gap-2">
+        {/* Controls aligned to the right */}
+        <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-2.5">
           <LanguageSwitcher />
           <ThemeToggle />
+          {/* Menu immediately after the brand */}
+          <button
+            type="button"
+            onClick={onMenuClick}
+            aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
+            aria-expanded={mobileOpen}
+            aria-controls="app-sidebar"
+            className="ml-1 flex size-9 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-sm transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 sm:size-10 lg:hidden"
+          >
+            {mobileOpen ? <X size={19} /> : <Menu size={19} />}
+          </button>
         </div>
       </div>
     </header>

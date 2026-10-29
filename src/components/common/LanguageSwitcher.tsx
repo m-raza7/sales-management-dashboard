@@ -77,25 +77,27 @@ export default function LanguageSwitcher() {
   return (
     <div ref={containerRef} className="relative inline-flex min-w-0 shrink-0">
       {/* Language selector button */}
+
       <button
         ref={triggerRef}
         type="button"
         disabled={!mounted}
-        onClick={toggleDropdown}
-        aria-label="Select language"
+        onClick={() => setIsOpen((previous) => !previous)}
+        aria-label={`Select language. Current language: ${selectedLanguage.label}`}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         className="
-          flex h-10 min-w-0 items-center gap-2
-          rounded-full border border-border
-          bg-card px-3 text-sm font-medium text-foreground
-          shadow-sm transition-all duration-200
-          hover:border-emerald-500/50 hover:bg-muted
-          focus-visible:outline-none focus-visible:ring-2
-          focus-visible:ring-emerald-500/30
-          active:scale-[0.98]
-          disabled:cursor-wait disabled:opacity-70
-        "
+    flex size-10 shrink-0 items-center justify-center gap-2
+    rounded-full border border-border
+    bg-card px-2 text-sm font-medium text-foreground
+    shadow-sm transition-all duration-200
+    hover:border-emerald-500/50 hover:bg-muted
+    focus-visible:outline-none focus-visible:ring-2
+    focus-visible:ring-emerald-500/30
+    active:scale-[0.98]
+    disabled:cursor-wait disabled:opacity-70
+    sm:w-auto sm:px-3
+  "
       >
         <Globe
           size={16}
@@ -103,12 +105,14 @@ export default function LanguageSwitcher() {
           className="shrink-0 text-emerald-600 dark:text-emerald-400"
         />
 
-        <span className="max-w-20 truncate">{selectedLanguage.label}</span>
+        <span className="hidden max-w-20 truncate sm:inline">
+          {selectedLanguage.label}
+        </span>
 
         <ChevronDown
           size={15}
           aria-hidden="true"
-          className={`shrink-0 text-muted-foreground transition-transform duration-200 ${
+          className={`hidden shrink-0 text-muted-foreground transition-transform duration-200 sm:block ${
             isOpen ? "rotate-180" : ""
           }`}
         />
