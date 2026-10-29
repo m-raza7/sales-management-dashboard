@@ -13,6 +13,8 @@ import { translations } from "@/lib/i18n/translations";
 
 export default function EditCustomerPage() {
   const params = useParams<{ id: string }>();
+  const id = Array.isArray(params.id) ? params.id[0] : params.id;
+
   const { language, mounted } = useLanguage();
   const t = translations[language];
 
@@ -20,17 +22,28 @@ export default function EditCustomerPage() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || !id) return;
 
-    const found = getCustomers().find((item) => item.id === params.id);
+    setReady(false);
 
-    setCustomer(found ?? null);
-    setReady(true);
-  }, [params.id, mounted]);
+    try {
+      // Read the latest customer data from localStorage through the service.
+      const customers = getCustomers();
+
+      const found = customers.find((item) => String(item.id) === String(id));
+
+      setCustomer(found ?? null);
+    } catch (error) {
+      console.error("Failed to load customer:", error);
+      setCustomer(null);
+    } finally {
+      setReady(true);
+    }
+  }, [id, mounted]);
 
   if (!mounted || !ready) {
     return (
-      <section className="mx-auto max-w-3xl space-y-6">
+      <section className="mx-auto w-full max-w-3xl space-y-6">
         <div className="h-8 w-48 animate-pulse rounded-lg bg-muted" />
         <div className="h-64 animate-pulse rounded-2xl bg-muted" />
       </section>
@@ -39,7 +52,7 @@ export default function EditCustomerPage() {
 
   if (!customer) {
     return (
-      <section className="mx-auto max-w-3xl space-y-4 text-foreground">
+      <section className="mx-auto w-full max-w-3xl space-y-4 text-foreground">
         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
           <Store size={24} />
         </div>
@@ -47,6 +60,11 @@ export default function EditCustomerPage() {
         <h1 className="text-2xl font-bold tracking-tight">
           {t.customerNotFound}
         </h1>
+
+        <p className="text-sm text-muted-foreground">
+          The customer may have been deleted, or the link may contain an
+          incorrect ID.
+        </p>
 
         <Link
           href="/customers"

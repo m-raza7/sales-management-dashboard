@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   ShoppingCart,
   Plus,
@@ -13,6 +14,7 @@ import {
   Package,
   ArrowUpRight,
   Download,
+  CheckCircle2,
 } from "lucide-react";
 
 import type { Order, OrderStatus } from "@/features/orders/types";
@@ -47,11 +49,18 @@ export default function OrdersPage() {
   const { language, mounted } = useLanguage();
   const t = translations[language];
 
+  const searchParams = useSearchParams();
+  const highlightId = searchParams.get("highlight");
+
   const [orders, setOrders] = useState<Order[]>([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [ready, setReady] = useState(false);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [highlightedId, setHighlightedId] = useState<string | null>(null);
+
+  const rowRefs = useRef<Map<string, HTMLTableRowElement>>(new Map());
+  const highlightTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const loadOrders = useCallback(() => {
     setOrders(getOrders());
@@ -61,6 +70,61 @@ export default function OrdersPage() {
   useEffect(() => {
     loadOrders();
   }, [loadOrders]);
+
+  // Highlight and scroll to the order selected from global search.
+  useEffect(() => {
+    if (!ready || !highlightId) {
+      setHighlightedId(null);
+      return;
+    }
+
+    const exists = orders.some(
+      (order) => String(order.id) === String(highlightId),
+    );
+
+    if (!exists) {
+      setHighlightedId(null);
+      return;
+    }
+
+    // Reset local filters so the requested order remains visible.
+    setSearch("");
+    setStatusFilter("all");
+    setHighlightedId(String(highlightId));
+
+    const frame = requestAnimationFrame(() => {
+      rowRefs.current.get(String(highlightId))?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    });
+
+    if (highlightTimer.current) {
+      clearTimeout(highlightTimer.current);
+    }
+
+    highlightTimer.current = setTimeout(() => {
+      setHighlightedId(null);
+      highlightTimer.current = null;
+    }, 5000);
+
+    return () => {
+      cancelAnimationFrame(frame);
+
+      if (highlightTimer.current) {
+        clearTimeout(highlightTimer.current);
+        highlightTimer.current = null;
+      }
+    };
+  }, [ready, highlightId, orders]);
+
+  useEffect(() => {
+    return () => {
+      if (highlightTimer.current) {
+        clearTimeout(highlightTimer.current);
+      }
+    };
+  }, []);
 
   function handleStatusChange(id: string, status: OrderStatus) {
     updateOrderStatus(id, status);
@@ -121,7 +185,11 @@ export default function OrdersPage() {
       order.customerName,
       order.paymentMethod,
       ...order.items.map((item) => item.productName),
-    ].some((value) => value.toLowerCase().includes(query));
+    ].some((value) =>
+      String(value ?? "")
+        .toLowerCase()
+        .includes(query),
+    );
 
     const matchesStatus =
       statusFilter === "all" || order.status === statusFilter;
@@ -173,6 +241,7 @@ export default function OrdersPage() {
     return (
       <div className="min-w-0 space-y-6 text-foreground">
         <div className="h-24 animate-pulse rounded-2xl bg-muted" />
+
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {[1, 2, 3].map((item) => (
             <div
@@ -181,6 +250,7 @@ export default function OrdersPage() {
             />
           ))}
         </div>
+
         <div className="h-72 animate-pulse rounded-2xl bg-muted" />
       </div>
     );
@@ -374,123 +444,156 @@ export default function OrdersPage() {
               </thead>
 
               <tbody className="divide-y divide-border">
-                {filteredOrders.map((order) => (
-                  <tr
-                    key={order.id}
-                    className="transition-colors hover:bg-muted/40"
-                  >
-                    <td className="px-5 py-4">
-                      <p className="font-semibold text-foreground">
-                        {order.orderNumber}
-                      </p>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {order.paymentMethod.replaceAll("_", " ")}
-                      </p>
-                    </td>
+                {filteredOrders.map((order) => {
+                  const orderId = String(order.id);
+                  const isHighlighted = highlightedId === orderId;
 
-                    <td className="px-5 py-4">
-                      <p className="font-medium text-foreground">
-                        {order.customerName}
-                      </p>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {order.items.length}{" "}
-                        {order.items.length === 1
-                          ? t.productLine
-                          : t.productLines}
-                      </p>
-                    </td>
-
-                    <td className="px-5 py-4">
-                      <div className="inline-flex items-center gap-2 text-foreground">
-                        <Package size={15} className="text-muted-foreground" />
-                        {order.items.reduce(
-                          (sum, item) => sum + item.quantity,
-                          0,
-                        )}
-                      </div>
-                    </td>
-
-                    <td className="px-5 py-4 font-semibold text-foreground">
-                      {money(order.total)}
-                    </td>
-
-                    <td className="px-5 py-4 text-muted-foreground">
-                      {new Date(order.createdAt).toLocaleDateString(
-                        language === "mr"
-                          ? "mr-IN"
-                          : language === "hi"
-                            ? "hi-IN"
-                            : "en-IN",
-                      )}
-                    </td>
-
-                    <td className="px-5 py-4">
-                      <div className="flex min-w-36 flex-col items-start gap-2">
-                        <span
-                          className={`inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ring-inset ${statusStyles[order.status]}`}
+                  return (
+                    <tr
+                      key={orderId}
+                      ref={(node) => {
+                        if (node) {
+                          rowRefs.current.set(orderId, node);
+                        } else {
+                          rowRefs.current.delete(orderId);
+                        }
+                      }}
+                      className={
+                        isHighlighted
+                          ? "search-result-highlight"
+                          : "transition-colors hover:bg-muted/40"
+                      }
+                    >
+                      <td className="px-5 py-4">
+                        <p
+                          className={`font-semibold ${
+                            isHighlighted
+                              ? "text-amber-700 dark:text-amber-300"
+                              : "text-foreground"
+                          }`}
                         >
-                          {statusLabels[order.status]}
-                        </span>
+                          {order.orderNumber}
+                        </p>
 
-                        <select
-                          value={order.status}
-                          onChange={(event) =>
-                            handleStatusChange(
-                              order.id,
-                              event.target.value as OrderStatus,
-                            )
-                          }
-                          aria-label={`${t.updateStatus}: ${order.orderNumber}`}
-                          className="h-9 w-full rounded-lg border border-border bg-background px-2 text-xs text-foreground outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 dark:[color-scheme:dark]"
-                        >
-                          {(
-                            [
-                              "pending",
-                              "confirmed",
-                              "dispatched",
-                              "delivered",
-                              "cancelled",
-                            ] as OrderStatus[]
-                          ).map((status) => (
-                            <option key={status} value={status}>
-                              {statusLabels[status]}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </td>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {order.paymentMethod.replaceAll("_", " ")}
+                        </p>
 
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => handleDownloadPdf(order)}
-                          disabled={downloadingId !== null}
-                          aria-label={`Download PDF for ${order.orderNumber}`}
-                          title="Download order PDF"
-                          className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 text-emerald-700 transition hover:bg-emerald-500/20 disabled:cursor-wait disabled:opacity-50 dark:text-emerald-300"
-                        >
-                          <Download size={15} />
-                          <span className="text-xs font-semibold">
-                            {downloadingId === order.id
-                              ? "Generating..."
-                              : "PDF"}
+                        {isHighlighted && (
+                          <span className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
+                            <CheckCircle2 size={12} />
+                            Search match
                           </span>
-                        </button>
+                        )}
+                      </td>
 
-                        <button
-                          type="button"
-                          onClick={() => handleDelete(order)}
-                          aria-label={`${t.delete}: ${order.orderNumber}`}
-                          title={t.deleteOrderAction}
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-500"
-                        >
-                          <Trash2 size={15} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      <td className="px-5 py-4">
+                        <p className="font-medium text-foreground">
+                          {order.customerName}
+                        </p>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {order.items.length}{" "}
+                          {order.items.length === 1
+                            ? t.productLine
+                            : t.productLines}
+                        </p>
+                      </td>
+
+                      <td className="px-5 py-4">
+                        <div className="inline-flex items-center gap-2 text-foreground">
+                          <Package
+                            size={15}
+                            className="text-muted-foreground"
+                          />
+                          {order.items.reduce(
+                            (sum, item) => sum + item.quantity,
+                            0,
+                          )}
+                        </div>
+                      </td>
+
+                      <td className="px-5 py-4 font-semibold text-foreground">
+                        {money(order.total)}
+                      </td>
+
+                      <td className="px-5 py-4 text-muted-foreground">
+                        {new Date(order.createdAt).toLocaleDateString(
+                          language === "mr"
+                            ? "mr-IN"
+                            : language === "hi"
+                              ? "hi-IN"
+                              : "en-IN",
+                        )}
+                      </td>
+
+                      <td className="px-5 py-4">
+                        <div className="flex min-w-36 flex-col items-start gap-2">
+                          <span
+                            className={`inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ring-inset ${statusStyles[order.status]}`}
+                          >
+                            {statusLabels[order.status]}
+                          </span>
+
+                          <select
+                            value={order.status}
+                            onChange={(event) =>
+                              handleStatusChange(
+                                order.id,
+                                event.target.value as OrderStatus,
+                              )
+                            }
+                            aria-label={`${t.updateStatus}: ${order.orderNumber}`}
+                            className="h-9 w-full rounded-lg border border-border bg-background px-2 text-xs text-foreground outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 dark:[color-scheme:dark]"
+                          >
+                            {(
+                              [
+                                "pending",
+                                "confirmed",
+                                "dispatched",
+                                "delivered",
+                                "cancelled",
+                              ] as OrderStatus[]
+                            ).map((status) => (
+                              <option key={status} value={status}>
+                                {statusLabels[status]}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </td>
+
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleDownloadPdf(order)}
+                            disabled={downloadingId !== null}
+                            aria-label={`Download PDF for ${order.orderNumber}`}
+                            title="Download order PDF"
+                            className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 text-emerald-700 transition hover:bg-emerald-500/20 disabled:cursor-wait disabled:opacity-50 dark:text-emerald-300"
+                          >
+                            <Download size={15} />
+                            <span className="text-xs font-semibold">
+                              {downloadingId === order.id
+                                ? "Generating..."
+                                : "PDF"}
+                            </span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(order)}
+                            aria-label={`${t.delete}: ${order.orderNumber}`}
+                            title={t.deleteOrderAction}
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-500"
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

@@ -19,7 +19,9 @@ import { useLanguage } from "@/components/providers/LanguageProvider";
 import { translations } from "@/lib/i18n/translations";
 
 export default function EditProductPage() {
-  const { id } = useParams<{ id: string }>();
+  const params = useParams<{ id: string | string[] }>();
+  const id = Array.isArray(params.id) ? params.id[0] : params.id;
+
   const { language, mounted } = useLanguage();
   const t = translations[language];
 
@@ -27,15 +29,19 @@ export default function EditProductPage() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || !id) return;
 
     setReady(false);
 
     try {
-      const foundProduct = getProducts().find((item) => item.id === id) ?? null;
+      const products = getProducts();
+
+      const foundProduct =
+        products.find((item) => String(item.id) === String(id)) ?? null;
 
       setProduct(foundProduct);
-    } catch {
+    } catch (error) {
+      console.error("Failed to load product:", error);
       setProduct(null);
     } finally {
       setReady(true);

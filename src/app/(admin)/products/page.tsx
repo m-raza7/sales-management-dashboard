@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   Package,
   Plus,
@@ -26,9 +27,16 @@ export default function ProductsPage() {
   const { language, mounted } = useLanguage();
   const t = translations[language];
 
+  const searchParams = useSearchParams();
+  const highlightId = searchParams.get("highlight");
+
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState("");
   const [ready, setReady] = useState(false);
+  const [highlightedId, setHighlightedId] = useState<string | null>(null);
+
+  const rowRefs = useRef<Map<string, HTMLTableRowElement>>(new Map());
+  const highlightTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Format currency according to the selected language.
   const money = useCallback(
@@ -53,15 +61,69 @@ export default function ProductsPage() {
     loadProducts();
   }, [loadProducts]);
 
+  // Find the requested product and highlight its row.
+  useEffect(() => {
+    if (!ready || !highlightId) {
+      setHighlightedId(null);
+      return;
+    }
+
+    const exists = products.some(
+      (product) => String(product.id) === String(highlightId),
+    );
+
+    if (!exists) {
+      setHighlightedId(null);
+      return;
+    }
+
+    setSearch("");
+    setHighlightedId(String(highlightId));
+
+    // Wait for the matching table row to render.
+    const frame = requestAnimationFrame(() => {
+      const row = rowRefs.current.get(String(highlightId));
+
+      row?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    });
+
+    if (highlightTimer.current) {
+      clearTimeout(highlightTimer.current);
+    }
+
+    highlightTimer.current = setTimeout(() => {
+      setHighlightedId(null);
+      highlightTimer.current = null;
+    }, 5000);
+
+    return () => {
+      cancelAnimationFrame(frame);
+
+      if (highlightTimer.current) {
+        clearTimeout(highlightTimer.current);
+        highlightTimer.current = null;
+      }
+    };
+  }, [ready, highlightId, products]);
+
+  useEffect(() => {
+    return () => {
+      if (highlightTimer.current) {
+        clearTimeout(highlightTimer.current);
+      }
+    };
+  }, []);
+
   function handleDelete(product: Product) {
     const confirmMessage = t.deleteProductConfirm.replace(
       "{name}",
       product.name,
     );
 
-    const confirmed = window.confirm(confirmMessage);
-
-    if (!confirmed) return;
+    if (!window.confirm(confirmMessage)) return;
 
     deleteProduct(product.id);
     loadProducts();
@@ -295,87 +357,109 @@ export default function ProductsPage() {
               </thead>
 
               <tbody className="divide-y divide-border">
-                {filteredProducts.map((product) => (
-                  <tr
-                    key={product.id}
-                    className="transition-colors hover:bg-muted/40"
-                  >
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 font-semibold text-primary">
-                          {product.name.trim().charAt(0).toUpperCase() || "P"}
+                {filteredProducts.map((product) => {
+                  const productId = String(product.id);
+                  const isHighlighted = highlightedId === productId;
+
+                  return (
+                    <tr
+                      key={productId}
+                      ref={(node) => {
+                        if (node) {
+                          rowRefs.current.set(productId, node);
+                        } else {
+                          rowRefs.current.delete(productId);
+                        }
+                      }}
+                      className={
+                        isHighlighted
+                          ? "search-result-highlight"
+                          : "transition-colors hover:bg-muted/40"
+                      }
+                    >
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 font-semibold text-primary">
+                            {product.name.trim().charAt(0).toUpperCase() || "P"}
+                          </div>
+
+                          <div className="min-w-0">
+                            <p
+                              className={`max-w-[220px] truncate font-semibold ${
+                                isHighlighted
+                                  ? "text-amber-700 dark:text-amber-300"
+                                  : "text-foreground"
+                              }`}
+                            >
+                              {product.name}
+                            </p>
+                            <p className="mt-1 max-w-[220px] truncate text-xs text-muted-foreground">
+                              {product.brand || t.noBrand}
+                            </p>
+                          </div>
                         </div>
+                      </td>
 
-                        <div className="min-w-0">
-                          <p className="max-w-[220px] truncate font-semibold text-foreground">
-                            {product.name}
-                          </p>
-                          <p className="mt-1 max-w-[220px] truncate text-xs text-muted-foreground">
-                            {product.brand || t.noBrand}
-                          </p>
-                        </div>
-                      </div>
-                    </td>
+                      <td className="px-5 py-4 text-foreground">
+                        {product.sku || "—"}
+                      </td>
 
-                    <td className="px-5 py-4 text-foreground">
-                      {product.sku || "—"}
-                    </td>
+                      <td className="px-5 py-4 text-foreground">
+                        {product.category || "—"}
+                      </td>
 
-                    <td className="px-5 py-4 text-foreground">
-                      {product.category || "—"}
-                    </td>
+                      <td className="px-5 py-4 text-foreground">
+                        {[product.size, product.unit]
+                          .filter(Boolean)
+                          .join(" / ") || "—"}
+                      </td>
 
-                    <td className="px-5 py-4 text-foreground">
-                      {[product.size, product.unit]
-                        .filter(Boolean)
-                        .join(" / ") || "—"}
-                    </td>
+                      <td className="px-5 py-4 font-semibold text-foreground">
+                        {money(product.price)}
+                      </td>
 
-                    <td className="px-5 py-4 font-semibold text-foreground">
-                      {money(product.price)}
-                    </td>
-
-                    <td className="px-5 py-4">
-                      <span
-                        className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold ${
-                          product.active
-                            ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
-                            : "bg-muted text-muted-foreground"
-                        }`}
-                      >
+                      <td className="px-5 py-4">
                         <span
-                          className={`h-1.5 w-1.5 rounded-full ${
-                            product.active ? "bg-emerald-500" : "bg-gray-400"
+                          className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold ${
+                            product.active
+                              ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+                              : "bg-muted text-muted-foreground"
                           }`}
-                        />
-                        {product.active ? t.active : t.inactive}
-                      </span>
-                    </td>
-
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-2">
-                        <Link
-                          href={`/products/${product.id}/edit`}
-                          aria-label={`${t.edit} ${product.name}`}
-                          title={t.editProductAction}
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition hover:border-ring hover:bg-primary/10 hover:text-primary"
                         >
-                          <Pencil size={15} />
-                        </Link>
+                          <span
+                            className={`h-1.5 w-1.5 rounded-full ${
+                              product.active ? "bg-emerald-500" : "bg-gray-400"
+                            }`}
+                          />
+                          {product.active ? t.active : t.inactive}
+                        </span>
+                      </td>
 
-                        <button
-                          type="button"
-                          onClick={() => handleDelete(product)}
-                          aria-label={`${t.delete} ${product.name}`}
-                          title={t.deleteProductAction}
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-500"
-                        >
-                          <Trash2 size={15} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-2">
+                          <Link
+                            href={`/products/${encodeURIComponent(productId)}`}
+                            aria-label={`${t.edit} ${product.name}`}
+                            title={t.editProductAction}
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition hover:border-ring hover:bg-primary/10 hover:text-primary"
+                          >
+                            <Pencil size={15} />
+                          </Link>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(product)}
+                            aria-label={`${t.delete} ${product.name}`}
+                            title={t.deleteProductAction}
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-500"
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

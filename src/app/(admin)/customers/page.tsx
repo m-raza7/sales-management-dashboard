@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   Users,
   Plus,
@@ -12,6 +13,7 @@ import {
   Phone,
   Store,
   X,
+  CheckCircle2,
 } from "lucide-react";
 
 import type { Customer } from "@/features/customers/types";
@@ -26,19 +28,71 @@ import { translations } from "@/lib/i18n/translations";
 export default function CustomersPage() {
   const { language, mounted } = useLanguage();
   const t = translations[language];
+  const searchParams = useSearchParams();
+
+  const highlightId = searchParams.get("highlight");
 
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [search, setSearch] = useState("");
   const [ready, setReady] = useState(false);
+  const [highlightedId, setHighlightedId] = useState<string | null>(null);
+
+  const rowRefs = useRef<Map<string, HTMLTableRowElement>>(new Map());
 
   const loadCustomers = useCallback(() => {
-    setCustomers(getCustomers());
-    setReady(true);
+    try {
+      setCustomers(getCustomers());
+    } catch (error) {
+      console.error("Failed to load customers:", error);
+      setCustomers([]);
+    } finally {
+      setReady(true);
+    }
   }, []);
 
   useEffect(() => {
+    if (!mounted) return;
     loadCustomers();
-  }, [loadCustomers]);
+  }, [mounted, loadCustomers]);
+
+  // Find, scroll to, and highlight the customer selected from global search.
+  useEffect(() => {
+    if (!ready || !highlightId) {
+      setHighlightedId(null);
+      return;
+    }
+
+    const matchingCustomer = customers.find(
+      (customer) => String(customer.id) === highlightId,
+    );
+
+    if (!matchingCustomer) {
+      setHighlightedId(null);
+      return;
+    }
+
+    setHighlightedId(highlightId);
+    setSearch("");
+
+    const frame = window.requestAnimationFrame(() => {
+      const row = rowRefs.current.get(highlightId);
+
+      row?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    });
+
+    // Remove the visual highlight after a short time.
+    const timeout = window.setTimeout(() => {
+      setHighlightedId((current) => (current === highlightId ? null : current));
+    }, 5000);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.clearTimeout(timeout);
+    };
+  }, [ready, highlightId, customers]);
 
   function handleDelete(customer: Customer) {
     const confirmed = window.confirm(
@@ -47,8 +101,12 @@ export default function CustomersPage() {
 
     if (!confirmed) return;
 
-    deleteCustomer(customer.id);
-    loadCustomers();
+    try {
+      deleteCustomer(customer.id);
+      loadCustomers();
+    } catch (error) {
+      console.error("Failed to delete customer:", error);
+    }
   }
 
   const query = search.trim().toLowerCase();
@@ -61,7 +119,11 @@ export default function CustomersPage() {
       customer.city,
       customer.state,
       customer.email,
-    ].some((value) => value.toLowerCase().includes(query)),
+    ].some((value) =>
+      String(value ?? "")
+        .toLowerCase()
+        .includes(query),
+    ),
   );
 
   if (!mounted) {
@@ -110,6 +172,17 @@ export default function CustomersPage() {
           {t.addCustomer}
         </Link>
       </section>
+
+      {/* Highlight notification */}
+      {highlightedId && (
+        <div
+          role="status"
+          className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-800 dark:text-emerald-300"
+        >
+          <CheckCircle2 size={18} />
+          Matching customer found and highlighted.
+        </div>
+      )}
 
       {/* Summary cards */}
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -265,76 +338,112 @@ export default function CustomersPage() {
               </thead>
 
               <tbody className="divide-y divide-border">
-                {filteredCustomers.map((customer) => (
-                  <tr
-                    key={customer.id}
-                    className="transition-colors hover:bg-muted/40"
-                  >
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 font-semibold text-primary">
-                          {customer.shopName.trim().charAt(0).toUpperCase() ||
-                            "S"}
+                {filteredCustomers.map((customer) => {
+                  const customerId = String(customer.id);
+                  const isHighlighted = highlightedId === customerId;
+
+                  return (
+                    <tr
+                      key={customerId}
+                      data-customer-id={customerId}
+                      ref={(element) => {
+                        if (element) {
+                          rowRefs.current.set(customerId, element);
+                        } else {
+                          rowRefs.current.delete(customerId);
+                        }
+                      }}
+                      className={
+                        isHighlighted
+                          ? "search-result-highlight"
+                          : "transition-colors hover:bg-muted/40"
+                      }
+                    >
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl font-semibold ${
+                              isHighlighted
+                                ? "bg-emerald-500 text-white"
+                                : "bg-primary/10 text-primary"
+                            }`}
+                          >
+                            {customer.shopName.trim().charAt(0).toUpperCase() ||
+                              "S"}
+                          </div>
+
+                          <div className="min-w-0">
+                            <p
+                              className={`max-w-[220px] truncate font-semibold ${
+                                isHighlighted
+                                  ? "text-emerald-700 dark:text-emerald-300"
+                                  : "text-foreground"
+                              }`}
+                            >
+                              {customer.shopName}
+                            </p>
+
+                            <p className="mt-1 max-w-[220px] truncate text-xs text-muted-foreground">
+                              {customer.email || t.noEmailProvided}
+                            </p>
+
+                            {isHighlighted && (
+                              <span className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
+                                <CheckCircle2 size={12} />
+                                Search match
+                              </span>
+                            )}
+                          </div>
                         </div>
+                      </td>
 
-                        <div className="min-w-0">
-                          <p className="max-w-[220px] truncate font-semibold text-foreground">
-                            {customer.shopName}
-                          </p>
+                      <td className="px-5 py-4 font-medium text-foreground">
+                        {customer.ownerName}
+                      </td>
 
-                          <p className="mt-1 max-w-[220px] truncate text-xs text-muted-foreground">
-                            {customer.email || t.noEmailProvided}
-                          </p>
+                      <td className="px-5 py-4">
+                        <span className="inline-flex items-center gap-2 text-muted-foreground">
+                          <Phone size={14} className="shrink-0" />
+                          <span className="text-foreground">
+                            {customer.phone}
+                          </span>
+                        </span>
+                      </td>
+
+                      <td className="px-5 py-4">
+                        <span className="inline-flex items-center gap-2 text-muted-foreground">
+                          <MapPin size={14} className="shrink-0" />
+                          <span className="text-foreground">
+                            {customer.city || t.notSpecified}
+                          </span>
+                        </span>
+                      </td>
+
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-2">
+                          <Link
+                            href={`/customers/${encodeURIComponent(customerId)}`}
+                            aria-label={`${t.edit} ${customer.shopName}`}
+                            title={t.editCustomerAction}
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition hover:border-ring hover:bg-primary/10 hover:text-primary"
+                          >
+                            <Pencil size={15} />
+                          </Link>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(customer)}
+                            aria-label={`${t.delete} ${customer.shopName}`}
+                            title={t.deleteCustomerAction}
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-500"
+                          >
+                            <Trash2 size={15} />
+                          </button>
                         </div>
-                      </div>
-                    </td>
-
-                    <td className="px-5 py-4 font-medium text-foreground">
-                      {customer.ownerName}
-                    </td>
-
-                    <td className="px-5 py-4">
-                      <span className="inline-flex items-center gap-2 text-muted-foreground">
-                        <Phone size={14} className="shrink-0" />
-                        <span className="text-foreground">
-                          {customer.phone}
-                        </span>
-                      </span>
-                    </td>
-
-                    <td className="px-5 py-4">
-                      <span className="inline-flex items-center gap-2 text-muted-foreground">
-                        <MapPin size={14} className="shrink-0" />
-                        <span className="text-foreground">
-                          {customer.city || t.notSpecified}
-                        </span>
-                      </span>
-                    </td>
-
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-2">
-                        <Link
-                          href={`/customers/${customer.id}/edit`}
-                          aria-label={`${t.edit} ${customer.shopName}`}
-                          title={t.editCustomerAction}
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition hover:border-ring hover:bg-primary/10 hover:text-primary"
-                        >
-                          <Pencil size={15} />
-                        </Link>
-
-                        <button
-                          type="button"
-                          onClick={() => handleDelete(customer)}
-                          aria-label={`${t.delete} ${customer.shopName}`}
-                          title={t.deleteCustomerAction}
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-500"
-                        >
-                          <Trash2 size={15} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

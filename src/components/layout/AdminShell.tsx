@@ -10,7 +10,6 @@ import {
   type ReactNode,
 } from "react";
 import { useRouter } from "next/navigation";
-
 import {
   Search,
   X,
@@ -21,65 +20,67 @@ import {
   ShoppingCart,
   Mic,
   MicOff,
+  type LucideIcon,
 } from "lucide-react";
 
 import Sidebar from "./Sidebar";
 import AppHeader from "@/components/common/AppHeader";
 import AppFooter from "@/components/common/AppFooter";
 
-// Update these import paths if your service files are stored elsewhere.
 import { searchCustomers } from "@/features/customers/customer.service";
 import { searchProducts } from "@/features/products/product.service";
 import { searchOrders } from "@/features/orders/order.service";
 
-// --------------------------------------------------
-// Speech recognition types
-// --------------------------------------------------
+/* --------------------------------------------------
+   Voice recognition types
+-------------------------------------------------- */
 
-type SpeechRecognitionResultLike = ArrayLike<{
-  transcript: string;
-}>;
+type SpeechResult = ArrayLike<{ transcript: string }>;
 
-type SpeechRecognitionEventLike = {
-  results: ArrayLike<SpeechRecognitionResultLike>;
+type SpeechEvent = {
+  results: ArrayLike<SpeechResult>;
 };
 
-type SpeechRecognitionErrorLike = {
+type SpeechErrorEvent = {
   error: string;
 };
 
-type SpeechRecognitionLike = {
+type SpeechRecognitionInstance = {
   lang: string;
   continuous: boolean;
   interimResults: boolean;
   onstart: (() => void) | null;
-  onresult: ((event: SpeechRecognitionEventLike) => void) | null;
-  onerror: ((event: SpeechRecognitionErrorLike) => void) | null;
+  onresult: ((event: SpeechEvent) => void) | null;
+  onerror: ((event: SpeechErrorEvent) => void) | null;
   onend: (() => void) | null;
   start: () => void;
   abort: () => void;
 };
 
-type SpeechRecognitionConstructor = new () => SpeechRecognitionLike;
+type SpeechRecognitionConstructor = new () => SpeechRecognitionInstance;
 
-type SpeechRecognitionWindow = Window & {
+type SpeechWindow = Window & {
   SpeechRecognition?: SpeechRecognitionConstructor;
   webkitSpeechRecognition?: SpeechRecognitionConstructor;
 };
 
-// --------------------------------------------------
-// Search item types
-// --------------------------------------------------
+/* --------------------------------------------------
+   Search types
+-------------------------------------------------- */
+
+type SearchCategory = "page" | "customer" | "product" | "order";
 
 type SearchItem = {
   key: string;
   label: string;
   description: string;
   href: string;
-  icon: typeof LayoutDashboard;
+  icon: LucideIcon;
   keywords: string[];
-  category: "page" | "customer" | "product" | "order";
+  category: SearchCategory;
 };
+
+type SearchRecord = Record<string, unknown>;
 
 type SearchResultsProps = {
   results: SearchItem[];
@@ -87,9 +88,9 @@ type SearchResultsProps = {
   onClose: () => void;
 };
 
-// --------------------------------------------------
-// Navigation search items
-// --------------------------------------------------
+/* --------------------------------------------------
+   Static navigation pages
+-------------------------------------------------- */
 
 const searchItems: SearchItem[] = [
   {
@@ -166,11 +167,9 @@ const searchItems: SearchItem[] = [
   },
 ];
 
-// --------------------------------------------------
-// Helpers for dynamic records
-// --------------------------------------------------
-
-type SearchRecord = Record<string, unknown>;
+/* --------------------------------------------------
+   Record helpers
+-------------------------------------------------- */
 
 function asRecord(value: unknown): SearchRecord {
   if (typeof value === "object" && value !== null) {
@@ -184,40 +183,43 @@ function getField(record: SearchRecord, fields: string[]): string {
   for (const field of fields) {
     const value = record[field];
 
-    if (typeof value === "string" || typeof value === "number") {
-      if (String(value).trim()) {
-        return String(value);
-      }
+    if (
+      (typeof value === "string" || typeof value === "number") &&
+      String(value).trim()
+    ) {
+      return String(value);
     }
   }
 
   return "";
 }
 
-function getCustomerLabel(customer: SearchRecord): string {
+function getCustomerLabel(record: SearchRecord): string {
   return (
-    getField(customer, [
+    getField(record, [
       "name",
       "customerName",
       "shopName",
       "companyName",
       "fullName",
     ]) ||
-    getField(customer, ["phone", "email", "id"]) ||
+    getField(record, ["phone", "email", "id"]) ||
     "Unnamed customer"
   );
 }
 
-function getProductLabel(product: SearchRecord): string {
+function getProductLabel(record: SearchRecord): string {
   return (
-    getField(product, ["name", "productName", "title", "sku"]) ||
-    getField(product, ["id"]) ||
+    getField(record, ["name", "productName", "title", "sku"]) ||
+    getField(record, ["id"]) ||
     "Unnamed product"
   );
 }
 
-function getOrderLabel(order: SearchRecord): string {
-  return getField(order, ["orderNumber", "reference", "id"]) || "Order";
+function getOrderLabel(record: SearchRecord): string {
+  return (
+    getField(record, ["orderNumber", "reference", "orderId", "id"]) || "Order"
+  );
 }
 
 function getRecordDescription(
@@ -225,21 +227,16 @@ function getRecordDescription(
   fields: string[],
   fallback: string,
 ): string {
-  const value = getField(record, fields);
-  return value || fallback;
+  return getField(record, fields) || fallback;
 }
 
-// --------------------------------------------------
-// Search results dropdown
-// --------------------------------------------------
+/* --------------------------------------------------
+   Search results dropdown
+-------------------------------------------------- */
 
 function SearchResults({ results, onNavigate, onClose }: SearchResultsProps) {
   return (
-    <div
-      className="absolute left-0 right-0 top-full z-[60] mt-2
-      overflow-hidden rounded-2xl border border-border
-      bg-popover text-popover-foreground shadow-xl"
-    >
+    <div className="absolute left-0 right-0 top-full z-[60] mt-2 overflow-hidden rounded-2xl border border-border bg-popover text-popover-foreground shadow-xl">
       <div className="flex items-center justify-between border-b border-border px-4 py-3">
         <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Search results ({results.length})
@@ -265,10 +262,7 @@ function SearchResults({ results, onNavigate, onClose }: SearchResultsProps) {
                 key={item.key}
                 type="button"
                 onClick={() => onNavigate(item.href)}
-                className="flex w-full items-center gap-3 rounded-xl p-3
-                text-left transition hover:bg-muted
-                focus-visible:outline-none focus-visible:ring-2
-                focus-visible:ring-ring"
+                className="flex w-full items-center gap-3 rounded-xl p-3 text-left transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
                   <Icon size={18} />
@@ -309,9 +303,9 @@ function SearchResults({ results, onNavigate, onClose }: SearchResultsProps) {
   );
 }
 
-// --------------------------------------------------
-// Admin shell with global text and voice search
-// --------------------------------------------------
+/* --------------------------------------------------
+   Admin shell
+-------------------------------------------------- */
 
 export default function AdminShell({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -327,24 +321,21 @@ export default function AdminShell({ children }: { children: ReactNode }) {
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const desktopSearchInputRef = useRef<HTMLInputElement>(null);
   const mobileSearchInputRef = useRef<HTMLInputElement>(null);
+  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
 
-  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
-
-  // Use en-IN for English, hi-IN for Hindi, or mr-IN for Marathi.
   const voiceLanguage = "en-IN";
-
   const query = search.trim().toLowerCase();
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  // Search navigation pages and live localStorage records.
-  // Data services are called only in the browser.
+  /* --------------------------------------------------
+     Search pages and saved records
+  -------------------------------------------------- */
+
   const filteredResults = useMemo<SearchItem[]>(() => {
-    if (!query) {
-      return [];
-    }
+    if (!query) return [];
 
     const pageResults = searchItems.filter((item) =>
       [item.label, item.description, ...item.keywords].some((value) =>
@@ -356,12 +347,20 @@ export default function AdminShell({ children }: { children: ReactNode }) {
       return pageResults;
     }
 
-    const customerResults: SearchItem[] = searchCustomers(query).map(
-      (customer) => {
+    const dynamicResults: SearchItem[] = [];
+
+    // Search customers
+    try {
+      const customers = searchCustomers(query);
+
+      for (const customer of customers) {
         const record = asRecord(customer);
         const id = getField(record, ["id"]);
 
-        return {
+        // A detail page requires the saved record ID.
+        if (!id) continue;
+
+        dynamicResults.push({
           key: `customer-${id}`,
           label: getCustomerLabel(record),
           description: getRecordDescription(
@@ -369,20 +368,28 @@ export default function AdminShell({ children }: { children: ReactNode }) {
             ["phone", "email", "address"],
             "Customer record",
           ),
-          href: `/customers/${encodeURIComponent(id)}`,
+          // href: `/customers/${encodeURIComponent(id)}`,
+          href: `/customers?highlight=${encodeURIComponent(String(customer.id))}`,
           icon: Users,
           keywords: [],
           category: "customer",
-        };
-      },
-    );
+        });
+      }
+    } catch (error) {
+      console.error("Customer search failed:", error);
+    }
 
-    const productResults: SearchItem[] = searchProducts(query).map(
-      (product) => {
+    // Search products
+    try {
+      const products = searchProducts(query);
+
+      for (const product of products) {
         const record = asRecord(product);
         const id = getField(record, ["id"]);
 
-        return {
+        if (!id) continue;
+
+        dynamicResults.push({
           key: `product-${id}`,
           label: getProductLabel(record),
           description: getRecordDescription(
@@ -390,47 +397,59 @@ export default function AdminShell({ children }: { children: ReactNode }) {
             ["category", "sku", "price", "description"],
             "Product record",
           ),
-          href: `/products/${encodeURIComponent(id)}`,
+          // href: `/products/${encodeURIComponent(id)}`,
+          href: `/products?highlight=${encodeURIComponent(String(product.id))}`,
           icon: Package,
           keywords: [],
           category: "product",
-        };
-      },
-    );
+        });
+      }
+    } catch (error) {
+      console.error("Product search failed:", error);
+    }
 
-    const orderResults: SearchItem[] = searchOrders(query).map((order) => {
-      const record = asRecord(order);
-      const id = getField(record, ["id"]);
-      const status = getField(record, ["status"]);
-      const total = getField(record, [
-        "total",
-        "totalAmount",
-        "grandTotal",
-        "amount",
-      ]);
+    // Search orders
+    try {
+      const orders = searchOrders(query);
 
-      const details = [
-        status ? `Status: ${status}` : "",
-        total ? `Total: ${total}` : "",
-      ].filter(Boolean);
+      for (const order of orders) {
+        const record = asRecord(order);
+        const id = getField(record, ["id"]);
 
-      return {
-        key: `order-${id}`,
-        label: getOrderLabel(record),
-        description: details.join(" · ") || "Order record",
-        href: `/orders/${encodeURIComponent(id)}`,
-        icon: ShoppingCart,
-        keywords: [],
-        category: "order",
-      };
-    });
+        if (!id) continue;
 
-    return [
-      ...pageResults,
-      ...customerResults,
-      ...productResults,
-      ...orderResults,
-    ].slice(0, 50);
+        const status = getField(record, ["status"]);
+        const total = getField(record, [
+          "total",
+          "totalAmount",
+          "grandTotal",
+          "amount",
+        ]);
+
+        const description = [
+          status ? `Status: ${status}` : "",
+          total ? `Total: ${total}` : "",
+        ]
+          .filter(Boolean)
+          .join(" · ");
+
+        dynamicResults.push({
+          key: `order-${id}`,
+          label: getOrderLabel(record),
+          description: description || "Order record",
+          // href: `/orders/${encodeURIComponent(id)}`,
+          href: `/orders?highlight=${encodeURIComponent(String(order.id))}`,
+          icon: ShoppingCart,
+          keywords: [],
+          category: "order",
+        });
+      }
+    } catch (error) {
+      console.error("Order search failed:", error);
+    }
+
+    // Show page matches first, then saved records.
+    return [...pageResults, ...dynamicResults].slice(0, 50);
   }, [query, isMounted]);
 
   const closeSearch = useCallback(() => {
@@ -475,19 +494,17 @@ export default function AdminShell({ children }: { children: ReactNode }) {
     [filteredResults, navigateTo],
   );
 
-  // --------------------------------------------------
-  // Voice search
-  // --------------------------------------------------
+  /* --------------------------------------------------
+     Voice search
+  -------------------------------------------------- */
 
   const startVoiceSearch = useCallback(() => {
-    if (recognitionRef.current) {
-      return;
-    }
+    if (recognitionRef.current) return;
 
     setVoiceError("");
     setVoiceMessage("");
 
-    const speechWindow = window as SpeechRecognitionWindow;
+    const speechWindow = window as SpeechWindow;
 
     const SpeechRecognitionAPI =
       speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition;
@@ -555,7 +572,8 @@ export default function AdminShell({ children }: { children: ReactNode }) {
 
     try {
       recognition.start();
-    } catch {
+    } catch (error) {
+      console.error("Unable to start voice search:", error);
       recognitionRef.current = null;
       setListening(false);
       setVoiceError("Unable to start voice recognition. Please try again.");
@@ -574,7 +592,6 @@ export default function AdminShell({ children }: { children: ReactNode }) {
     setVoiceMessage("");
   }, []);
 
-  // Clean up the microphone when the shell unmounts.
   useEffect(() => {
     return () => {
       const recognition = recognitionRef.current;
@@ -588,7 +605,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
         try {
           recognition.abort();
         } catch {
-          // The recognition session may already have ended.
+          // Recognition may already have stopped.
         }
 
         recognitionRef.current = null;
@@ -596,17 +613,15 @@ export default function AdminShell({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  // --------------------------------------------------
-  // Outside click and keyboard shortcuts
-  // --------------------------------------------------
+  /* --------------------------------------------------
+     Outside click and keyboard shortcuts
+  -------------------------------------------------- */
 
   useEffect(() => {
     function handleOutsideClick(event: PointerEvent) {
       const target = event.target;
 
-      if (!(target instanceof Node)) {
-        return;
-      }
+      if (!(target instanceof Node)) return;
 
       if (!searchContainerRef.current?.contains(target)) {
         setSearchOpen(false);
@@ -651,9 +666,28 @@ export default function AdminShell({ children }: { children: ReactNode }) {
     };
   }, [closeSearch, focusSearch]);
 
-  // --------------------------------------------------
-  // Render
-  // --------------------------------------------------
+  /* --------------------------------------------------
+     Search input
+  -------------------------------------------------- */
+
+  const handleSearchChange = useCallback((value: string) => {
+    setSearch(value);
+    setSearchOpen(true);
+    setVoiceError("");
+    setVoiceMessage("");
+  }, []);
+
+  const clearSearch = useCallback(() => {
+    setSearch("");
+    setVoiceError("");
+    setVoiceMessage("");
+    setSearchOpen(true);
+    focusSearch();
+  }, [focusSearch]);
+
+  /* --------------------------------------------------
+     Render
+  -------------------------------------------------- */
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -685,12 +719,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                 ref={desktopSearchInputRef}
                 type="search"
                 value={search}
-                onChange={(event) => {
-                  setSearch(event.target.value);
-                  setSearchOpen(true);
-                  setVoiceError("");
-                  setVoiceMessage("");
-                }}
+                onChange={(event) => handleSearchChange(event.target.value)}
                 onFocus={() => setSearchOpen(true)}
                 placeholder="Search customers, products, orders..."
                 aria-label="Search the application"
@@ -703,12 +732,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                 ref={mobileSearchInputRef}
                 type="search"
                 value={search}
-                onChange={(event) => {
-                  setSearch(event.target.value);
-                  setSearchOpen(true);
-                  setVoiceError("");
-                  setVoiceMessage("");
-                }}
+                onChange={(event) => handleSearchChange(event.target.value)}
                 onFocus={() => setSearchOpen(true)}
                 placeholder="Search customers, products, orders..."
                 aria-label="Search the application"
@@ -716,17 +740,11 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                 className="h-10 w-full rounded-xl border border-border bg-card pl-10 pr-24 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-emerald-700/50 focus:ring-2 focus:ring-emerald-700/10 md:hidden"
               />
 
-              {/* Clear search: desktop */}
+              {/* Desktop clear button */}
               {search && (
                 <button
                   type="button"
-                  onClick={() => {
-                    setSearch("");
-                    setVoiceError("");
-                    setVoiceMessage("");
-                    setSearchOpen(true);
-                    focusSearch();
-                  }}
+                  onClick={clearSearch}
                   aria-label="Clear search"
                   className="absolute right-[4.25rem] top-1/2 hidden -translate-y-1/2 rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground md:flex"
                 >
@@ -734,17 +752,11 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                 </button>
               )}
 
-              {/* Clear search: mobile */}
+              {/* Mobile clear button */}
               {search && (
                 <button
                   type="button"
-                  onClick={() => {
-                    setSearch("");
-                    setVoiceError("");
-                    setVoiceMessage("");
-                    setSearchOpen(true);
-                    focusSearch();
-                  }}
+                  onClick={clearSearch}
                   aria-label="Clear search"
                   className="absolute right-12 top-1/2 -translate-y-1/2 rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground md:hidden"
                 >
@@ -796,7 +808,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
               </button>
             </form>
 
-            {/* Voice messages */}
+            {/* Voice status */}
             {listening && (
               <p
                 className="mt-2 flex items-center gap-2 text-xs text-emerald-700 dark:text-emerald-400"
