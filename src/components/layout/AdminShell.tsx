@@ -9,7 +9,9 @@ import {
   type FormEvent,
   type ReactNode,
 } from "react";
+
 import { useRouter } from "next/navigation";
+
 import {
   Search,
   X,
@@ -24,16 +26,16 @@ import {
 } from "lucide-react";
 
 import Sidebar from "./Sidebar";
+
 import AppHeader from "@/components/common/AppHeader";
+
 import AppFooter from "@/components/common/AppFooter";
 
 import { searchCustomers } from "@/features/customers/customer.service";
-import { searchProducts } from "@/features/products/product.service";
-import { searchOrders } from "@/features/orders/order.service";
 
-/* --------------------------------------------------
-   Voice recognition types
--------------------------------------------------- */
+import { searchProducts } from "@/features/products/product.service";
+
+import { searchOrders } from "@/features/orders/order.service";
 
 type SpeechResult = ArrayLike<{ transcript: string }>;
 
@@ -47,13 +49,21 @@ type SpeechErrorEvent = {
 
 type SpeechRecognitionInstance = {
   lang: string;
+
   continuous: boolean;
+
   interimResults: boolean;
+
   onstart: (() => void) | null;
+
   onresult: ((event: SpeechEvent) => void) | null;
+
   onerror: ((event: SpeechErrorEvent) => void) | null;
+
   onend: (() => void) | null;
+
   start: () => void;
+
   abort: () => void;
 };
 
@@ -61,22 +71,25 @@ type SpeechRecognitionConstructor = new () => SpeechRecognitionInstance;
 
 type SpeechWindow = Window & {
   SpeechRecognition?: SpeechRecognitionConstructor;
+
   webkitSpeechRecognition?: SpeechRecognitionConstructor;
 };
-
-/* --------------------------------------------------
-   Search types
--------------------------------------------------- */
 
 type SearchCategory = "page" | "customer" | "product" | "order";
 
 type SearchItem = {
   key: string;
+
   label: string;
+
   description: string;
+
   href: string;
+
   icon: LucideIcon;
+
   keywords: string[];
+
   category: SearchCategory;
 };
 
@@ -84,92 +97,141 @@ type SearchRecord = Record<string, unknown>;
 
 type SearchResultsProps = {
   results: SearchItem[];
+
   onNavigate: (href: string) => void;
+
   onClose: () => void;
 };
-
-/* --------------------------------------------------
-   Static navigation pages
--------------------------------------------------- */
 
 const searchItems: SearchItem[] = [
   {
     key: "dashboard",
+
     label: "Dashboard",
+
     description: "Business overview and summary",
+
     href: "/dashboard",
+
     icon: LayoutDashboard,
+
     keywords: ["home", "overview", "stats", "summary"],
+
     category: "page",
   },
+
   {
     key: "customers",
+
     label: "Customers",
+
     description: "View and manage customers",
+
     href: "/customers",
+
     icon: Users,
+
     keywords: ["shops", "shopkeepers", "clients", "customer list"],
+
     category: "page",
   },
+
   {
     key: "add-customer",
+
     label: "Add customer",
+
     description: "Register a new customer",
+
     href: "/customers/new",
+
     icon: Users,
+
     keywords: ["create customer", "new shop", "add shop"],
+
     category: "page",
   },
+
   {
     key: "products",
+
     label: "Products",
+
     description: "Manage your product catalogue",
+
     href: "/products",
+
     icon: Package,
+
     keywords: ["catalogue", "inventory", "items", "goods"],
+
     category: "page",
   },
+
   {
     key: "add-product",
+
     label: "Add product",
+
     description: "Create a product",
+
     href: "/products/new",
+
     icon: Package,
+
     keywords: ["new product", "create product"],
+
     category: "page",
   },
+
   {
     key: "orders",
+
     label: "Orders",
+
     description: "View and manage orders",
+
     href: "/orders",
+
     icon: ShoppingCart,
+
     keywords: ["sales", "order history", "pending orders"],
+
     category: "page",
   },
+
   {
     key: "new-order",
+
     label: "New order",
+
     description: "Create an order",
+
     href: "/orders/new",
+
     icon: ShoppingCart,
+
     keywords: ["create order", "place order", "sales order"],
+
     category: "page",
   },
+
   {
     key: "legal",
+
     label: "Legal & Security",
+
     description: "Privacy, terms, and security policies",
+
     href: "/legal",
+
     icon: LayoutDashboard,
+
     keywords: ["privacy", "terms", "copyright", "security", "policies"],
+
     category: "page",
   },
 ];
-
-/* --------------------------------------------------
-   Record helpers
--------------------------------------------------- */
 
 function asRecord(value: unknown): SearchRecord {
   if (typeof value === "object" && value !== null) {
@@ -198,9 +260,13 @@ function getCustomerLabel(record: SearchRecord): string {
   return (
     getField(record, [
       "name",
+
       "customerName",
+
       "shopName",
+
       "companyName",
+
       "fullName",
     ]) ||
     getField(record, ["phone", "email", "id"]) ||
@@ -224,15 +290,13 @@ function getOrderLabel(record: SearchRecord): string {
 
 function getRecordDescription(
   record: SearchRecord,
+
   fields: string[],
+
   fallback: string,
 ): string {
   return getField(record, fields) || fallback;
 }
-
-/* --------------------------------------------------
-   Search results dropdown
--------------------------------------------------- */
 
 function SearchResults({ results, onNavigate, onClose }: SearchResultsProps) {
   return (
@@ -303,36 +367,46 @@ function SearchResults({ results, onNavigate, onClose }: SearchResultsProps) {
   );
 }
 
-/* --------------------------------------------------
-   Admin shell
--------------------------------------------------- */
-
 export default function AdminShell({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   const [mobileOpen, setMobileOpen] = useState(false);
+
   const [search, setSearch] = useState("");
+
   const [searchOpen, setSearchOpen] = useState(false);
+
   const [listening, setListening] = useState(false);
+
   const [voiceMessage, setVoiceMessage] = useState("");
+
   const [voiceError, setVoiceError] = useState("");
+
   const [isMounted, setIsMounted] = useState(false);
 
   const searchContainerRef = useRef<HTMLDivElement>(null);
+
   const desktopSearchInputRef = useRef<HTMLInputElement>(null);
+
   const mobileSearchInputRef = useRef<HTMLInputElement>(null);
+
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
 
   const voiceLanguage = "en-IN";
+
   const query = search.trim().toLowerCase();
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  /* --------------------------------------------------
-     Search pages and saved records
-  -------------------------------------------------- */
+  {
+    /* --------------------------------------------------*
+
+*     Search pages and saved records*
+
+*  -------------------------------------------------- */
+  }
 
   const filteredResults = useMemo<SearchItem[]>(() => {
     if (!query) return [];
@@ -348,106 +422,130 @@ export default function AdminShell({ children }: { children: ReactNode }) {
     }
 
     const dynamicResults: SearchItem[] = [];
-
     // Search customers
     try {
       const customers = searchCustomers(query);
 
       for (const customer of customers) {
         const record = asRecord(customer);
-        const id = getField(record, ["id"]);
 
+        const id = getField(record, ["id"]);
         // A detail page requires the saved record ID.
         if (!id) continue;
 
         dynamicResults.push({
           key: `customer-${id}`,
+
           label: getCustomerLabel(record),
+
           description: getRecordDescription(
             record,
+
             ["phone", "email", "address"],
+
             "Customer record",
           ),
           // href: `/customers/${encodeURIComponent(id)}`,
           href: `/customers?highlight=${encodeURIComponent(String(customer.id))}`,
+
           icon: Users,
+
           keywords: [],
+
           category: "customer",
         });
       }
     } catch (error) {
       console.error("Customer search failed:", error);
     }
-
     // Search products
     try {
       const products = searchProducts(query);
 
       for (const product of products) {
         const record = asRecord(product);
+
         const id = getField(record, ["id"]);
 
         if (!id) continue;
 
         dynamicResults.push({
           key: `product-${id}`,
+
           label: getProductLabel(record),
+
           description: getRecordDescription(
             record,
+
             ["category", "sku", "price", "description"],
+
             "Product record",
           ),
           // href: `/products/${encodeURIComponent(id)}`,
           href: `/products?highlight=${encodeURIComponent(String(product.id))}`,
+
           icon: Package,
+
           keywords: [],
+
           category: "product",
         });
       }
     } catch (error) {
       console.error("Product search failed:", error);
     }
-
     // Search orders
     try {
       const orders = searchOrders(query);
 
       for (const order of orders) {
         const record = asRecord(order);
+
         const id = getField(record, ["id"]);
 
         if (!id) continue;
 
         const status = getField(record, ["status"]);
+
         const total = getField(record, [
           "total",
+
           "totalAmount",
+
           "grandTotal",
+
           "amount",
         ]);
 
         const description = [
           status ? `Status: ${status}` : "",
+
           total ? `Total: ${total}` : "",
         ]
+
           .filter(Boolean)
+
           .join(" · ");
 
         dynamicResults.push({
           key: `order-${id}`,
+
           label: getOrderLabel(record),
+
           description: description || "Order record",
           // href: `/orders/${encodeURIComponent(id)}`,
           href: `/orders?highlight=${encodeURIComponent(String(order.id))}`,
+
           icon: ShoppingCart,
+
           keywords: [],
+
           category: "order",
         });
       }
     } catch (error) {
       console.error("Order search failed:", error);
     }
-
     // Show page matches first, then saved records.
     return [...pageResults, ...dynamicResults].slice(0, 50);
   }, [query, isMounted]);
@@ -473,13 +571,18 @@ export default function AdminShell({ children }: { children: ReactNode }) {
   const navigateTo = useCallback(
     (href: string) => {
       setSearchOpen(false);
+
       setSearch("");
+
       setMobileOpen(false);
+
       setVoiceMessage("");
+
       setVoiceError("");
 
       router.push(href);
     },
+
     [router],
   );
 
@@ -491,17 +594,23 @@ export default function AdminShell({ children }: { children: ReactNode }) {
         navigateTo(filteredResults[0].href);
       }
     },
+
     [filteredResults, navigateTo],
   );
 
-  /* --------------------------------------------------
-     Voice search
-  -------------------------------------------------- */
+  {
+    /* --------------------------------------------------*
+
+*     Voice search*
+
+*  -------------------------------------------------- */
+  }
 
   const startVoiceSearch = useCallback(() => {
     if (recognitionRef.current) return;
 
     setVoiceError("");
+
     setVoiceMessage("");
 
     const speechWindow = window as SpeechWindow;
@@ -513,33 +622,44 @@ export default function AdminShell({ children }: { children: ReactNode }) {
       setVoiceError(
         "Voice search is not supported in this browser. Try Chrome and allow microphone access.",
       );
+
       return;
     }
 
     const recognition = new SpeechRecognitionAPI();
 
     recognition.lang = voiceLanguage;
+
     recognition.continuous = false;
+
     recognition.interimResults = false;
 
     recognitionRef.current = recognition;
 
     recognition.onstart = () => {
       setListening(true);
+
       setSearchOpen(true);
+
       setVoiceMessage("Listening... Speak your search.");
     };
 
     recognition.onresult = (event) => {
       const transcript = Array.from(event.results)
+
         .map((result) => result[0]?.transcript ?? "")
+
         .join("")
+
         .trim();
 
       if (transcript) {
         setSearch(transcript);
+
         setSearchOpen(true);
+
         setVoiceError("");
+
         setVoiceMessage(`Recognized: "${transcript}"`);
       }
     };
@@ -548,12 +668,17 @@ export default function AdminShell({ children }: { children: ReactNode }) {
       const messages: Record<string, string> = {
         "not-allowed":
           "Microphone permission denied. Please allow microphone access.",
+
         "service-not-allowed":
           "The browser's speech recognition service is not allowed.",
+
         "no-speech": "No speech detected. Please try again.",
+
         "audio-capture":
           "No microphone was detected. Check your microphone connection.",
+
         network: "Voice recognition failed because of a network issue.",
+
         aborted: "Voice recognition was stopped.",
       };
 
@@ -561,12 +686,14 @@ export default function AdminShell({ children }: { children: ReactNode }) {
         setVoiceError(
           messages[event.error] ?? `Voice recognition failed: ${event.error}.`,
         );
+
         setVoiceMessage("");
       }
     };
 
     recognition.onend = () => {
       setListening(false);
+
       recognitionRef.current = null;
     };
 
@@ -574,8 +701,11 @@ export default function AdminShell({ children }: { children: ReactNode }) {
       recognition.start();
     } catch (error) {
       console.error("Unable to start voice search:", error);
+
       recognitionRef.current = null;
+
       setListening(false);
+
       setVoiceError("Unable to start voice recognition. Please try again.");
     }
   }, [voiceLanguage]);
@@ -585,10 +715,12 @@ export default function AdminShell({ children }: { children: ReactNode }) {
 
     if (recognition) {
       recognition.abort();
+
       recognitionRef.current = null;
     }
 
     setListening(false);
+
     setVoiceMessage("");
   }, []);
 
@@ -598,8 +730,11 @@ export default function AdminShell({ children }: { children: ReactNode }) {
 
       if (recognition) {
         recognition.onstart = null;
+
         recognition.onresult = null;
+
         recognition.onerror = null;
+
         recognition.onend = null;
 
         try {
@@ -613,9 +748,13 @@ export default function AdminShell({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  /* --------------------------------------------------
-     Outside click and keyboard shortcuts
-  -------------------------------------------------- */
+  {
+    /* --------------------------------------------------*
+
+*     Outside click and keyboard shortcuts*
+
+*  -------------------------------------------------- */
+  }
 
   useEffect(() => {
     function handleOutsideClick(event: PointerEvent) {
@@ -639,58 +778,82 @@ export default function AdminShell({ children }: { children: ReactNode }) {
 
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
+
         focusSearch();
+
         return;
       }
 
       if (event.key === "/" && !isTyping) {
         event.preventDefault();
+
         focusSearch();
+
         return;
       }
 
       if (event.key === "Escape") {
         closeSearch();
+
         desktopSearchInputRef.current?.blur();
+
         mobileSearchInputRef.current?.blur();
+
         setMobileOpen(false);
       }
     }
 
     document.addEventListener("pointerdown", handleOutsideClick);
+
     document.addEventListener("keydown", handleKeyboard);
 
     return () => {
       document.removeEventListener("pointerdown", handleOutsideClick);
+
       document.removeEventListener("keydown", handleKeyboard);
     };
   }, [closeSearch, focusSearch]);
 
-  /* --------------------------------------------------
-     Search input
-  -------------------------------------------------- */
+  {
+    /* --------------------------------------------------*
+
+*     Search input*
+
+*  -------------------------------------------------- */
+  }
 
   const handleSearchChange = useCallback((value: string) => {
     setSearch(value);
+
     setSearchOpen(true);
+
     setVoiceError("");
+
     setVoiceMessage("");
   }, []);
 
   const clearSearch = useCallback(() => {
     setSearch("");
+
     setVoiceError("");
+
     setVoiceMessage("");
+
     setSearchOpen(true);
+
     focusSearch();
   }, [focusSearch]);
 
-  /* --------------------------------------------------
-     Render
-  -------------------------------------------------- */
+  {
+    /* --------------------------------------------------*
+
+*     Render*
+
+*  -------------------------------------------------- */
+  }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="nexora-theme-transition min-h-screen bg-background text-foreground">
       <Sidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
 
       <div className="flex min-h-screen min-w-0 flex-col lg:pl-[272px]">
@@ -715,6 +878,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
               />
 
               {/* Desktop search */}
+
               <input
                 ref={desktopSearchInputRef}
                 type="search"
@@ -728,6 +892,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
               />
 
               {/* Mobile search */}
+
               <input
                 ref={mobileSearchInputRef}
                 type="search"
@@ -741,6 +906,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
               />
 
               {/* Desktop clear button */}
+
               {search && (
                 <button
                   type="button"
@@ -753,6 +919,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
               )}
 
               {/* Mobile clear button */}
+
               {search && (
                 <button
                   type="button"
@@ -765,6 +932,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
               )}
 
               {/* Keyboard shortcut */}
+
               {!search && (
                 <span className="pointer-events-none absolute right-[4.25rem] top-1/2 hidden -translate-y-1/2 rounded-md border border-border px-2 py-1 text-[10px] text-muted-foreground md:block">
                   Ctrl K
@@ -772,6 +940,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
               )}
 
               {/* Desktop microphone */}
+
               <button
                 type="button"
                 onClick={listening ? stopVoiceSearch : startVoiceSearch}
@@ -790,6 +959,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
               </button>
 
               {/* Mobile microphone */}
+
               <button
                 type="button"
                 onClick={listening ? stopVoiceSearch : startVoiceSearch}
@@ -809,6 +979,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
             </form>
 
             {/* Voice status */}
+
             {listening && (
               <p
                 className="mt-2 flex items-center gap-2 text-xs text-emerald-700 dark:text-emerald-400"
@@ -832,6 +1003,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
             )}
 
             {/* Dynamic search results */}
+
             {searchOpen && query && (
               <SearchResults
                 results={filteredResults}

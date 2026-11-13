@@ -49,8 +49,6 @@ const SOCIAL_LINKS = [
   },
 ];
 
-const X_PROFILE_URL = "https://x.com/YOUR_USERNAME";
-
 export default function AppFooter() {
   const { language } = useLanguage();
   const t = translations[language].footer;
@@ -68,9 +66,21 @@ export default function AppFooter() {
       href: "/legal/privacy-policy",
       Icon: ShieldCheck,
     },
-    { label: t.terms, href: "/legal/terms", Icon: FileText },
-    { label: t.copyright, href: "/legal/copyright", Icon: Copyright },
-    { label: t.security, href: "/legal/security", Icon: ShieldCheck },
+    {
+      label: t.terms,
+      href: "/legal/terms",
+      Icon: FileText,
+    },
+    {
+      label: t.copyright,
+      href: "/legal/copyright",
+      Icon: Copyright,
+    },
+    {
+      label: t.security,
+      href: "/legal/security",
+      Icon: ShieldCheck,
+    },
   ];
 
   return (
@@ -194,23 +204,11 @@ export default function AppFooter() {
                   rel="noopener noreferrer"
                   aria-label={label}
                   title={label}
-                  className="flex size-10 items-center justify-center rounded-xl bordertext-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-700/40 hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 dark:hover:text-emerald-400"
+                  className="flex size-10 items-center justify-center rounded-xl border border-border bg-background text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-700/40 hover:bg-emerald-700/10 hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 dark:hover:text-emerald-400"
                 >
                   <Icon size={18} aria-hidden="true" />
                 </a>
               ))}
-
-              {/* X logo */}
-              {/* <a
-                href={X_PROFILE_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="X"
-                title="X"
-                className="flex size-10 items-center justify-center rounded-xl border border-border bg-background text-sm font-bold text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-700/40 hover:bg-emerald-700/10 hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 dark:hover:text-emerald-400"
-              >
-                𝕏
-              </a> */}
             </div>
           </section>
         </div>

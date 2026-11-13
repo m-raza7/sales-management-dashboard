@@ -404,3 +404,188 @@ select {
 .dark .surface-card {
   box-shadow: 0 4px 24px rgb(0 0 0 / 12%);
 }
+
+/* ----------------------------------------------------------------------------------------- */
+
+/* =====================================
+   3D FLIP PAGE TRANSITION
+===================================== */
+
+.page-flip-perspective {
+  perspective: 1500px;
+  width: 100%;
+  min-height: 100%;
+}
+
+.page-flip {
+  width: 100%;
+  min-height: 100%;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  transform-origin: center center;
+  will-change: transform, opacity;
+}
+
+/* Reduce animation for users who prefer less motion */
+@media (prefers-reduced-motion: reduce) {
+  .page-flip {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* =========================================
+   NEXORA 3D PAGE FLIP TRANSITION
+========================================= */
+
+.nexora-page-transition {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  perspective: 1600px;
+  perspective-origin: center center;
+}
+
+.nexora-page-transition-content {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+
+  will-change: transform, opacity;
+}
+
+/* Keep the transition compatible with the theme */
+.nexora-page-transition-content {
+  background-color: transparent;
+  color: inherit;
+}
+
+/* Accessibility: reduce animation when requested */
+@media (prefers-reduced-motion: reduce) {
+  .nexora-page-transition,
+  .nexora-page-transition-content {
+    perspective: none;
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+    will-change: auto;
+  }
+}
+
+/* =========================================
+   NEXORA ANIMATED LAYOUT
+========================================= */
+
+.nexora-animated-layout {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  perspective: 1600px;
+  perspective-origin: center center;
+}
+
+.nexora-animated-layout-content {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+
+  color: inherit;
+  background-color: transparent;
+
+  will-change: transform, opacity;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .nexora-animated-layout,
+  .nexora-animated-layout-content {
+    perspective: none;
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+    will-change: auto;
+  }
+}
+
+/* =========================================================
+   NEXORA — PAGE TRANSITION ANIMATIONS
+   ========================================================= */
+
+/* 3D perspective wrapper for route transitions */
+.nexora-page-transition {
+  perspective: 1600px;
+  perspective-origin: center center;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Animated page content */
+.nexora-page-transition-content {
+  width: 100%;
+  min-width: 0;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: transform, opacity;
+}
+
+/* Keep page content stable during transitions */
+.nexora-page-transition-content > * {
+  min-width: 0;
+}
+
+/* =========================================================
+   NEXORA — THEME COLOR TRANSITIONS
+   Scoped to the AdminShell wrapper
+   ========================================================= */
+
+.nexora-theme-transition,
+.nexora-theme-transition * {
+  transition-property:
+    background-color, color, border-color, outline-color, box-shadow, fill,
+    stroke;
+  transition-duration: 350ms;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Prevent theme transitions from affecting route animation */
+.nexora-theme-transition .nexora-page-transition-content {
+  transition-property: none;
+}
+
+/* =========================================================
+   NEXORA — LANGUAGE TRANSITION SUPPORT
+   Fade and slide are controlled by Motion in PageTransition.tsx
+   ========================================================= */
+
+.nexora-page-transition-content {
+  transform-origin: center center;
+}
+
+/* =========================================================
+   NEXORA — ACCESSIBILITY
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .nexora-page-transition {
+    perspective: none;
+  }
+
+  .nexora-page-transition-content {
+    transform: none !important;
+    backface-visibility: visible;
+    -webkit-backface-visibility: visible;
+    will-change: auto;
+  }
+
+  .nexora-theme-transition,
+  .nexora-theme-transition * {
+    transition-duration: 0.01ms !important;
+  }
+}

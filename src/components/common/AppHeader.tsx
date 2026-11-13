@@ -37,6 +37,7 @@ export default function AppHeader({ mobileOpen, onMenuClick }: AppHeaderProps) {
             <span className="nexora-shine block text-base font-extrabold leading-tight tracking-[0.06em] sm:text-xl sm:tracking-[0.1em]">
               NEXORA
             </span>
+
             <span className="mt-0.5 block whitespace-nowrap text-[8px] font-bold uppercase tracking-[0.13em] text-muted-foreground sm:text-[9px]">
               Sales Management
             </span>
@@ -46,8 +47,10 @@ export default function AppHeader({ mobileOpen, onMenuClick }: AppHeaderProps) {
         {/* Controls aligned to the right */}
         <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-2.5">
           <LanguageSwitcher />
+
           <ThemeToggle />
-          {/* Menu immediately after the brand */}
+
+          {/* Mobile navigation menu */}
           <button
             type="button"
             onClick={onMenuClick}

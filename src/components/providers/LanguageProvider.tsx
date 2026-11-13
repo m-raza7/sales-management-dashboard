@@ -20,6 +20,7 @@ type LanguageContextValue = {
   setLanguage: (language: Language) => void;
   t: (key: TranslationKey) => string;
   mounted: boolean;
+  languageTransitionKey: number;
 };
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
@@ -36,6 +37,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>("en");
   const [mounted, setMounted] = useState(false);
 
+  // Used to trigger full-page language transition animation
+  const [languageTransitionKey, setLanguageTransitionKey] = useState(0);
+
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
 
@@ -50,7 +54,16 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const setLanguage = useCallback((nextLanguage: Language) => {
-    setLanguageState(nextLanguage);
+    setLanguageState((currentLanguage) => {
+      if (currentLanguage === nextLanguage) {
+        return currentLanguage;
+      }
+
+      // Trigger language-change animation
+      setLanguageTransitionKey((currentKey) => currentKey + 1);
+
+      return nextLanguage;
+    });
 
     localStorage.setItem(STORAGE_KEY, nextLanguage);
     document.documentElement.lang = LANGUAGE_LOCALES[nextLanguage];
@@ -68,6 +81,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         setLanguage,
         t,
         mounted,
+        languageTransitionKey,
       }}
     >
       {children}

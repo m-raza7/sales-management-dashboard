@@ -2,6 +2,7 @@
 
 import { ThemeProvider as NextThemeProvider } from "next-themes";
 import type { ReactNode } from "react";
+
 import { LanguageProvider } from "./LanguageProvider";
 
 export default function ThemeProvider({ children }: { children: ReactNode }) {
@@ -11,7 +12,7 @@ export default function ThemeProvider({ children }: { children: ReactNode }) {
       defaultTheme="light"
       enableSystem={false}
       storageKey="sales-management-theme"
-      disableTransitionOnChange
+      disableTransitionOnChange={false}
     >
       <LanguageProvider>{children}</LanguageProvider>
     </NextThemeProvider>
