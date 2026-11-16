@@ -589,3 +589,231 @@ select {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Main page transition wrapper */
+.nexora-page-transition {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  perspective: 1400px;
+  perspective-origin: center center;
+}
+
+/* Animated page */
+.nexora-page-transition-content {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+
+  overflow: hidden;
+}
+
+/* Route content */
+.nexora-route-content {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+
+  z-index: 1;
+}
+
+/* =========================================
+   HOME: PUZZLE / SPLIT ANIMATION
+========================================= */
+
+.nexora-puzzle-grid {
+  position: absolute;
+  inset: 0;
+
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+
+  z-index: 20;
+  pointer-events: none;
+
+  overflow: hidden;
+}
+
+.nexora-puzzle-tile {
+  width: 100%;
+  height: 100%;
+
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 45%, #312e81 100%);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  transform-origin: center center;
+
+  will-change: transform, opacity;
+}
+
+/* =========================================
+   ABOUT: 3D FLIP ANIMATION
+========================================= */
+
+.flip-container {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+/* =========================================
+   CONTACT: CURTAIN ANIMATION
+========================================= */
+
+.nexora-curtain-overlay {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  background: linear-gradient(135deg, #7c3aed, #312e81);
+
+  transform-origin: top center;
+
+  z-index: 20;
+  pointer-events: none;
+
+  will-change: transform;
+}
+
+/* =========================================
+   REDUCED MOTION ACCESSIBILITY
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .nexora-page-transition-content,
+  .nexora-puzzle-tile,
+  .nexora-curtain-overlay {
+    will-change: auto;
+  }
+}
+
+/* =========================================
+   MAIN PAGE TRANSITION
+========================================= */
+
+.nexora-page-transition {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  perspective: 1400px;
+  perspective-origin: center center;
+}
+
+.nexora-page-transition-content {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+
+  overflow: hidden;
+}
+
+.nexora-route-content {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  z-index: 1;
+}
+
+/* =========================================
+   HOME: PUZZLE ANIMATION
+========================================= */
+
+.nexora-puzzle-grid {
+  position: absolute;
+  inset: 0;
+
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+
+  z-index: 20;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.nexora-puzzle-tile {
+  width: 100%;
+  height: 100%;
+
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 45%, #312e81 100%);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+/* =========================================
+   ABOUT: 3D FLIP
+========================================= */
+
+.flip-container {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+/* =========================================
+   CONTACT: CURTAIN REVEAL
+========================================= */
+
+.nexora-curtain-overlay {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  background: linear-gradient(135deg, #7c3aed, #312e81);
+
+  transform-origin: top center;
+
+  z-index: 20;
+  pointer-events: none;
+
+  will-change: transform;
+}
+
+/* =========================================
+   PRODUCTS: SLIDE
+========================================= */
+
+.slide-container {
+  will-change: transform, opacity;
+}
+
+/* =========================================
+   SERVICES: BLUR
+========================================= */
+
+.blur-container {
+  will-change: transform, opacity, filter;
+}
+
+/* =========================================
+   DASHBOARD: ZOOM
+========================================= */
+
+.zoom-container {
+  will-change: transform, opacity;
+}
+
+/* =========================================
+   ACCESSIBILITY
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .nexora-page-transition-content,
+  .nexora-puzzle-tile,
+  .nexora-curtain-overlay {
+    will-change: auto;
+  }
+}
